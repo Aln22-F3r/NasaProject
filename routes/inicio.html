@@ -24,9 +24,20 @@
       animation: pulse-nasa 3s infinite ease-in-out;
     }
 
+    /* ------------------------------------------- */
+    /* IMAGEN DE FONDO DE ESTRELLAS (Actualizado) */
+    /* ------------------------------------------- */
+    body {
+      /* Usamos la imagen Fondo_Estrellas.png */
+      background-image: url('/images/Fondo_Estrellas.png'); 
+      background-size: cover; /* Cubre todo el fondo */
+      background-position: center; /* Centra la imagen */
+      background-repeat: no-repeat; /* No repite la imagen */
+      background-attachment: fixed; /* La imagen de fondo se mantiene fija */
+    }
   </style>
 </head>
-<body class="bg-black min-h-screen text-white font-sans star-bg">
+<body class="min-h-screen text-white font-sans"> 
 
   <section class="flex flex-col items-center justify-center text-center px-6 py-20 relative z-10">
     <img src="/images/Logo_Nasa.png" alt="Logo de la NASA" class="h-40 md:h-56 mb-10 drop-shadow-xl animate-pulse-nasa">
@@ -40,7 +51,7 @@
       y sencilla
     </p>
 
-    <div class="bg-[#1a1a1a] rounded-2xl shadow-lg px-8 py-6 max-w-3xl">
+    <div class="bg-black/70 rounded-2xl shadow-lg px-8 py-6 max-w-3xl border border-gray-700 backdrop-blur-sm"> 
       <p class="text-xl md:text-2xl text-[#b71c1c] font-semibold mb-3">
         Objetivo
       </p>
@@ -55,6 +66,5 @@
     </a>
   </section>
 
-<div class="bg-white">-</div>
 </body>
 </html>
