@@ -5,18 +5,38 @@
   <title>About US - PROJECT NASA</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-black min-h-screen text-white font-sans star-bg relative">
+  <style>
 
-  <!-- Botón Regresar arriba a la izquierda -->
-  <div class="absolute top-6 left-6 flex items-center gap-4">
-    <a href="inicio.html"
-       class="px-4 py-2 bg-[#b71c1c] text-white rounded-full shadow-lg 
-              hover:bg-[#8e0000] hover:shadow-xl hover:scale-105 
-              transition duration-300 ease-in-out">
-      ← Regresar
-    </a>
-  </div>
+    /* ------------------------------------------- */
+    /* ANIMACIÓN DEL LOGO (sin cambios) */
+    /* ------------------------------------------- */
+    @keyframes pulse-nasa {
+      0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+      }
+      50% {
+        transform: scale(1.05);
+        filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.7));
+      }
+    }
+
+    .animate-pulse-nasa {
+      animation: pulse-nasa 3s infinite ease-in-out;
+    }
+
+    
+    body {
+      /* Usamos la imagen Fondo_Estrellas.png */
+      background-image: url('/images/Fondo_Estrellas.png'); 
+      background-size: cover; /* Cubre todo el fondo */
+      background-position: center; /* Centra la imagen */
+      background-repeat: no-repeat; /* No repite la imagen */
+      background-attachment: fixed; /* La imagen de fondo se mantiene fija */
+    }
+  </style>
+</head>
+
 
   <!-- Logo arriba a la derecha -->
   <div class="absolute top-6 right-6">
@@ -28,6 +48,14 @@
     <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 drop-shadow-lg">
       Equipo de trabajo
     </h1>
+    <div class="absolute top-6 left-6 flex items-center gap-4">
+    <a href="inicio.html"
+        class="px-4 py-2 bg-[#b71c1c] text-white rounded-full shadow-lg 
+        hover:bg-[#8e0000] hover:shadow-xl hover:scale-105
+        transition duration-300 ease-in-out">
+        Regresar
+    </a>
+</div>
 
     <p class="text-lg md:text-xl text-gray-300 max-w-3xl leading-relaxed mb-12">
       <span class="text-white font-semibold">
