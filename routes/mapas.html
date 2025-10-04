@@ -1,1 +1,105 @@
-"Hola"
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mapa con botón dinámico</title>
+
+ 
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/>
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+</head>
+<body class="bg-black flex flex-col items-center justify-center min-h-screen text-white px-4">
+
+  <h1 class="text-2xl font-bold mb-2">Viabilidad de energías renovables</h1>
+  <p class="mb-2 text-gray-300">Paso 1: Escoger una ubicación para evaluar la viabilidad.</p>
+  <p class="mb-2 text-gray-300">Paso 2: Seleccionar la calidad de imagen (representación de temperatura).</p>
+  <p class="mb-4 text-gray-300">Paso 3: Enviar la información en el botón.</p>
+
+  
+  <div class="w-full max-w-3xl h-80 border-2 border-gray-300 rounded-lg shadow-md overflow-hidden mb-4">
+    <div id="map" class="h-full w-full"></div>
+  </div>
+
+
+  <p id="coords" class="text-lg text-blue-300 font-mono mb-4"></p>
+
+
+  <div class="mb-4 w-full max-w-3xl flex items-center gap-3">
+    <label for="quality" class="text-sm text-gray-300">Calidad de imagen:</label>
+    <select id="quality" class="text-black px-3 py-2 rounded-md w-52 disabled:opacity-50" disabled>
+      <option value="baja">Baja</option>
+      <option value="media" selected>Media</option>
+      <option value="alta">Alta</option>
+    </select>
+  </div>
+
+
+  <button
+    id="sendBtn"
+    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition
+           opacity-0 pointer-events-none duration-300">
+    Enviar
+  </button>
+
+  <script>
+
+    const map = L.map('map').setView([19.4326, -99.1332], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap',
+      maxZoom: 19,
+    }).addTo(map);
+
+    let marker;
+    const coordsEl = document.getElementById('coords');
+    const btn = document.getElementById('sendBtn');
+    const qualitySel = document.getElementById('quality');
+
+   
+    function setPoint(latlng) {
+      if (marker) map.removeLayer(marker);
+
+      const lat = latlng.lat.toFixed(6);
+      const lng = latlng.lng.toFixed(6);
+
+      marker = L.marker(latlng).addTo(map)
+               .bindPopup(`Lat: ${lat}<br>Lng: ${lng}`).openPopup();
+
+      coordsEl.textContent = `Lat: ${lat} | Lng: ${lng}`;
+
+     
+      btn.classList.remove('opacity-0', 'pointer-events-none');
+      btn.classList.add('opacity-100', 'pointer-events-auto');
+      qualitySel.disabled = false;
+    }
+
+    map.on('click', (e) => setPoint(e.latlng));
+
+   
+    L.Control.geocoder({
+      defaultMarkGeocode: false,
+      placeholder: 'Buscar lugar...',
+      position: 'topleft'
+    })
+    .on('markgeocode', (e) => {
+      const center = e.geocode.center;
+      const bbox = e.geocode.bbox;
+      map.fitBounds(bbox);
+      setPoint(center);
+    })
+    .addTo(map);
+
+   
+    btn.addEventListener('click', () => {
+      
+      alert('Listo para enviar al backend (coords + calidad).');
+    });
+  </script>
+</body>
+</html>
