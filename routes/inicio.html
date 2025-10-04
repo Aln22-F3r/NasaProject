@@ -1,12 +1,71 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tailwind desde CDN</title>
+  <meta charset="UTF-8" />
+  <title>Inicio - Liga CUT Tonalá</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 text-center">
-  <h1 class="text-4xl font-bold text-blue-600 mt-10">¡Hola Tailwind desde CDN! 💅</h1>
+<body class="bg-[#0f172a] min-h-screen text-[#e2e8f0] font-sans">
+
+  <!-- Navbar -->
+  <nav class="flex items-center justify-between bg-[#1e293b] shadow-lg px-6 py-4 rounded-b-2xl">
+    <!-- Botón hamburguesa -->
+    <div class="relative">
+      <button id="menuBtn" class="focus:outline-none">
+        <svg class="w-12 h-12 text-[#e2e8f0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+      <!-- Menú desplegable -->
+      <div id="menu" class="hidden absolute mt-7 w-42 bg-[#1e293b] rounded-2xl shadow-lg z-10">
+        <a href="index.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Registro</a>
+        <a href="inicio.html" class="block px-4 py-2 text-[#22c55e] font-semibold">Inicio</a>
+        <a href="conocenos.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Conócenos</a>
+        <a href="calendario.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Calendario</a>
+        <a href="equipos.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Equipos Registrados</a>
+      </div>
+    </div>
+
+    <div>
+      <img src="assets/cut.png" alt="Logo UDG" class="h-14">
+    </div>
+  </nav>
+
+  <section class="flex flex-col items-center justify-center text-center px-6 py-20">
+    <img src="assets/cut.png" alt="Logo Liga CUT" class="h-40 md:h-56 mb-10 drop-shadow-xl">
+
+    <!-- Texto principal -->
+    <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 drop-shadow-lg">
+      Liga CUT Tonalá 
+    </h1>
+    <p class="text-lg md:text-xl text-[#cbd5e1] max-w-3xl leading-relaxed mb-8">
+      La <span class="text-[#22c55e] font-semibold">Liga CUT Tonalá</span> nació con la misión de impulsar 
+      el deporte universitario y fortalecer la comunidad estudiantil a través del fútbol.  
+    </p>
+
+    <div class="bg-[#1e293b] rounded-2xl shadow-lg px-8 py-6 max-w-3xl">
+      <p class="text-xl md:text-2xl text-[#3b82f6] font-semibold mb-3">
+         Nuestra meta
+      </p>
+      <p class="text-[#e2e8f0] text-lg md:text-xl">
+        Queremos llegar a todas las universidades de <span class="text-[#22c55e] font-bold">Guadalajara</span>,  
+        construyendo una red deportiva que una a estudiantes, equipos y talentos de toda la región.
+      </p>
+    </div>
+
+    <!-- Botón hacia panel -->
+    <a href="index.html" class="mt-10 px-8 py-4 rounded-full font-semibold bg-gradient-to-r from-[#22c55e] to-[#3b82f6] text-white shadow-lg hover:scale-105 transition-transform">
+      REGISTRATE A TI Y A TU EQUIPO
+    </a>
+  </section>
+
+  <script>
+    // Menú hamburguesa
+    document.getElementById('menuBtn').addEventListener('click', () => {
+      document.getElementById('menu').classList.toggle('hidden');
+    });
+  </script>
+
 </body>
 </html>
