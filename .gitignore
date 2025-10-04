@@ -1,3 +1,6 @@
+# env
+.env
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -108,5 +111,3 @@ celerybeat.pid
 .DS_Store
 
 
-# env
-.env
