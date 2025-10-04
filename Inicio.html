@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Inicio  NASA PROJECT</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#0f172a] min-h-screen text-[#e2e8f0] font-sans">
+
+  <!-- Navbar -->
+  <nav class="flex items-center justify-between bg-[#1e293b] shadow-lg px-6 py-4 rounded-b-2xl">
+    <!-- Botón hamburguesa -->
+    <div class="relative">
+      <button id="menuBtn" class="focus:outline-none">
+        <svg class="w-12 h-12 text-[#e2e8f0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+      <!-- Menú desplegable -->
+      <div id="menu" class="hidden absolute mt-7 w-42 bg-[#1e293b] rounded-2xl shadow-lg z-10">
+        <a href="index.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20"></a>
+        <a href="inicio.html" class="block px-4 py-2 text-[#22c55e] font-semibold"></a>
+        <a href="conocenos.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20"></a>
+        <a href="calendario.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20"></a>
+        <a href="equipos.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20"></a>
+      </div>
+    </div>
+
+    <div>
+      <img src="recursos/nasa.png" alt="Logo NASA" class="h-14">
+    </div>
+  </nav>
+
+  <section class="flex flex-col items-center justify-center text-center px-6 py-20">
+    <img src="recursos/NASA.png" alt="Logo Liga CUT" class="h-40 md:h-56 mb-10 drop-shadow-xl">
+
+    <!-- Texto principal -->
+    <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 drop-shadow-lg">
+        Proyecto de estudiantes    </h1>
+
+    <div class="bg-[#1e293b] rounded-2xl shadow-lg px-8 py-6 max-w-3xl">
+      <p class="text-xl md:text-2xl text-[#3b82f6] font-semibold mb-3">
+         Proyecto sobre la NASA de estudiantes del CUTONALA
+      </p>
+      <p class="text-[#e2e8f0] text-lg md:text-xl">
+       Participantes <span class="text-[#22c55e] font-bold">CUTONALA</span>,  
+       Alan Ramos
+       Daniel Espinoza
+       Oswaldo Ruiz
+       Isaac Martinez
+       Kevin Tejada
+       Diego Silva
+      </p>
+    </div>
+
+   
+  </section>
+
+  <script>
+    // Menú hamburguesa
+    document.getElementById('menuBtn').addEventListener('click', () => {
+      document.getElementById('menu').classList.toggle('hidden');
+    });
+  </script>
+
+</body>
+</html>
