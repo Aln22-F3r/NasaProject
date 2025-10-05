@@ -5,41 +5,39 @@
   <title>SatelitLeo – Parámetros del análisis</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Tailwind (opcional) -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin></script>
 
-  <!-- Tus estilos opcionales -->
+  <!-- Mantén tu hoja de estilos con el fondo original -->
   <link rel="stylesheet" href="/routes/utilidad/css/styles.css" />
 </head>
-<body class="min-h-screen text-white font-sans relative overflow-x-hidden">
+<body class="body-page min-h-screen text-white font-sans">
 
-  <main class="px-6 py-10 max-w-6xl mx-auto space-y-10">
-    <h1 class="text-3xl md:text-5xl font-extrabold text-center mb-4">Configuración de parámetros</h1>
-
-    <!-- ===== MAPA ===== -->
-    <section class="bg-black/70 w-full rounded-2xl shadow-lg border border-gray-700 backdrop-blur-sm p-6 space-y-6">
-      <h2 class="text-xl font-semibold text-center">Selecciona una ubicación</h2>
-
-      <div class="map-container relative rounded-2xl overflow-hidden shadow-lg w-full">
-        <div id="map" class="rounded-2xl w-full h-96 md:h-[500px]"></div>
-      </div>
-
-      <p id="pointInfo" class="text-gray-300 text-center">
+  <main class="px-5 md:px-6 py-8 md:py-10 max-w-6xl mx-auto space-y-8">
+    <header class="text-center">
+      <h1 class="text-3xl md:text-5xl font-extrabold text-red-500 font-semibold">Configuración de parámetros</h1>
+      <p class="text-gray-300 mt-2">Selecciona un punto en el mapa y ajusta los parámetros necesarios.</p>
+    </header>
+ 
+    <!-- MAPA -->
+    <section class="w-full rounded-2xl border border-gray-700/60 bg-black/40 p-4">
+      <h2 class="text-xl font-semibold text-center mb-3">Selecciona una ubicación</h2>
+      <div id="map" class="w-full h-[360px] md:h-[520px] rounded-xl overflow-hidden"></div>
+      <p id="pointInfo" class="text-center text-gray-200 mt-3">
         Haz clic en el mapa para seleccionar un punto.
       </p>
     </section>
 
-    <!-- ===== FORMULARIO DE PARÁMETROS (SIN lat/lon/fechas) ===== -->
-    <section class="bg-black/60 p-6 rounded-2xl shadow-md border border-gray-700 space-y-4">
-      <h2 class="text-lg font-semibold text-center mb-3">Parámetros del análisis</h2>
-
+    <!-- FORMULARIO DE PARÁMETROS (SIN lat/lon/fechas) -->
+    <section class="w-full rounded-2xl border border-gray-700/60 bg-black/40 p-4 space-y-4">
+      <h2 class="text-lg font-semibold text-center text-red-500 font-semibold">Parámetros del análisis</h2>
       <form id="paramForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm mb-1">Parámetros (params):</label>
+          <label class="block text-sm mb-1">Parámetros (params)</label>
           <input
             type="text"
             id="params"
@@ -47,10 +45,11 @@
             placeholder="Ej: t_2m:C,wind_speed_10m:ms"
             value="t_2m:C"
           />
+          <p class="text-xs text-gray-300 mt-1">Separa por coma si envías varios.</p>
         </div>
 
         <div>
-          <label class="block text-sm mb-1">Paso temporal (step):</label>
+          <label class="block text-sm mb-1">Paso temporal (step)</label>
           <input
             type="text"
             id="step"
@@ -58,54 +57,61 @@
             placeholder="Ej: PT1H, PT3H, PT9H"
             value="PT9H"
           />
+          <p class="text-xs text-gray-300 mt-1">Duración ISO 8601 (p. ej. PT1H = 1 hora).</p>
         </div>
 
-        <!-- Estos dos se usan SOLO para Grid -->
+        <!-- Solo para Grid -->
         <div>
-          <label class="block text-sm mb-1">Resolución latitud (res_lat) [Grid]:</label>
+          <label class="block text-sm mb-1">Resolución latitud (res_lat) [Grid]</label>
           <input
             type="number"
             id="res_lat"
+            step="0.01"
             class="w-full rounded-md p-2 text-black"
             placeholder="Ej: 0.02"
-            step="0.01"
             value="0.02"
           />
         </div>
 
         <div>
-          <label class="block text-sm mb-1">Resolución longitud (res_lon) [Grid]:</label>
+          <label class="block text-sm mb-1">Resolución longitud (res_lon) [Grid]</label>
           <input
             type="number"
             id="res_lon"
+            step="0.01"
             class="w-full rounded-md p-2 text-black"
             placeholder="Ej: 0.02"
-            step="0.01"
             value="0.02"
           />
         </div>
       </form>
 
-      <p class="text-xs text-gray-400 text-center">
-        Rango de tiempo: <b>últimos 365 días</b> hasta ahora (se calcula automáticamente).
+      <p class="text-center text-xs text-gray-300">
+        Rango de tiempo automático: últimos <b>365 días</b> hasta ahora.
       </p>
     </section>
 
-    <!-- ===== BOTONES ===== -->
-    <div id="ctas" class="mt-6 flex flex-wrap gap-4 justify-center hidden">
-      <a href="#" class="px-6 py-3 rounded-full font-semibold bg-[#b71c1c] text-white hover:bg-[#8e0000]" data-endpoint="grid">
-        Analizar como Mapa (Grid)
-      </a>
-      <a href="#" class="px-6 py-3 rounded-full font-semibold bg-[#b71c1c] text-white hover:bg-[#8e0000]" data-endpoint="timeseries">
-        Analizar como Serie Temporal (TimeSeries)
-      </a>
-    </div>
+    <!-- BOTONES -->
+    <section class="text-center">
+      <div id="ctas" class="hidden flex flex-wrap gap-4 justify-center">
+        <a href="#" class="px-6 py-3 rounded-full font-semibold bg-[#b71c1c] hover:bg-[#8e0000] text-white"
+           data-endpoint="grid">
+          Analizar como Mapa (Grid)
+        </a>
+        <a href="#" class="px-6 py-3 rounded-full font-semibold bg-[#b71c1c] hover:bg-[#8e0000] text-white"
+           data-endpoint="timeseries">
+          Analizar como Serie Temporal (Time Series)
+        </a>
+      </div>
+      <p class="text-xs text-gray-300 mt-2">Los botones aparecen cuando elijas una ubicación en el mapa.</p>
+    </section>
   </main>
 
-  <footer class="w-full py-8 text-center text-gray-400 text-sm">
+  <footer class="py-8 text-center text-gray-400 text-sm">
     © 2025 SatelitLeo Project
   </footer>
 
   <script src="/routes/utilidad/js/scripts.js"></script>
 </body>
 </html>
+ 
