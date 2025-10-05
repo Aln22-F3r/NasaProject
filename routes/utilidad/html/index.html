@@ -5,8 +5,7 @@
   <title>SatelitLeo - Casos de uso</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="/routes/inicio/css/styles.css">
-  <link rel="stylesheet" href="/routes/casos/css/casos.css">
+  <link rel="stylesheet" href="/routes/utilidad/css/styles.css">
 </head>
 <body class="min-h-screen text-white font-sans relative overflow-x-hidden">
 
@@ -25,7 +24,7 @@
     <section class="space-y-4">
       <h1 class="text-3xl md:text-5xl font-extrabold drop-shadow anim-fade-up">Casos de uso</h1>
       <p class="text-gray-300 text-lg md:text-xl max-w-3xl anim-fade-up" style="animation-delay:120ms">
-        Selecciona un escenario. Te indicamos el endpoint óptimo (<span class="text-white font-semibold">Time Series</span> o <span class="text-white font-semibold">Grid</span>), las variables típicas y un ejemplo de consulta.
+        Selecciona un escenario. Te indicamos el endpoint óptimo (<span class="text-white font-semibold">Analisis de datos</span> o <span class="text-white font-semibold">Mapa</span>), las variables típicas y un ejemplo de consulta.
       </p>
     </section>
 
@@ -33,7 +32,7 @@
     <section class="bg-black/70 w-full rounded-2xl shadow-lg border border-gray-700 backdrop-blur-sm p-6 space-y-6 anim-fade-up" style="animation-delay:200ms">
       <h2 class="text-xl md:text-2xl font-semibold">Asistente de recomendación</h2>
 
-      <!-- Form: habilita reset nativo -->
+      <!-- Form -->
       <form id="formCasos" class="space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
@@ -71,7 +70,6 @@
             Obtener recomendación
           </button>
 
-          <!-- reset nativo -->
           <button id="limpiar" type="reset"
             class="px-5 py-2 rounded-full font-semibold bg-white/10 text-white hover:bg-white/20 border border-gray-700">
             Limpiar
@@ -79,7 +77,8 @@
         </div>
 
         <!-- Resultados -->
-        <div id="resultado" class="hidden rounded-xl border border-gray-700 bg-black/50 p-5">
+        <div id="resultado" class="hidden rounded-xl border border-gray-700 bg-black/50 p-5"
+             role="region" aria-live="polite" aria-label="Resultado de recomendación">
           <div class="flex items-center gap-2 mb-3">
             <span id="badgeEndpoint" class="inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold"></span>
             <span id="badgeConf" class="text-xs text-gray-400"></span>
@@ -95,6 +94,14 @@
               <pre id="ejemplo" class="text-xs bg-black/60 border border-gray-700 rounded-lg p-3 overflow-x-auto"></pre>
             </div>
           </div>
+
+          <!-- CTAs -->
+          <div id="ctas" class="mt-4 flex flex-wrap gap-3 opacity-0 max-h-0 overflow-hidden expand">
+            <a id="ctaMapa" href="/routes/mapas/html/index.html"
+               class="btn-cta" data-endpoint="grid" aria-label="Ir al mapa">Ir al mapa</a>
+            <a id="ctaAnalisis" href="/routes/analisis/html/index.html"
+               class="btn-cta" data-endpoint="timeseries" aria-label="Ir al análisis de datos">Análisis de datos</a>
+          </div>
         </div>
       </form>
     </section>
@@ -106,19 +113,19 @@
         <article class="case-card">
           <h3 class="case-title">Radiación solar para fotovoltaica</h3>
           <p class="case-text">Estimación de potencial solar por zona para dimensionamiento preliminar.</p>
-          <div class="case-chips"><span class="chip">Grid</span><span class="chip">Área</span><span class="chip">Horaria</span></div>
+          <div class="case-chips"><span class="chip">Mapa</span><span class="chip">Área</span><span class="chip">Horaria</span></div>
           <button class="case-btn" data-case="pv">Ver recomendación</button>
         </article>
         <article class="case-card">
           <h3 class="case-title">Viento para eólica en sitio</h3>
           <p class="case-text">Validación de recurso eólico en un punto con serie histórica.</p>
-          <div class="case-chips"><span class="chip">Time Series</span><span class="chip">Punto</span><span class="chip">Histórico</span></div>
+          <div class="case-chips"><span class="chip">Analisis de datos</span><span class="chip">Punto</span><span class="chip">Histórico</span></div>
           <button class="case-btn" data-case="wind">Ver recomendación</button>
         </article>
         <article class="case-card">
           <h3 class="case-title">Mapa de temperatura superficial</h3>
           <p class="case-text">Mapa temático para condiciones térmicas actuales.</p>
-          <div class="case-chips"><span class="chip">Grid</span><span class="chip">Área</span><span class="chip">Actual</span></div>
+          <div class="case-chips"><span class="chip">Mapa</span><span class="chip">Área</span><span class="chip">Actual</span></div>
           <button class="case-btn" data-case="temp">Ver recomendación</button>
         </article>
       </div>
@@ -144,6 +151,6 @@
     <p class="text-gray-500 text-xs mt-4">© 2025 SatelitLeo Project.</p>
   </footer>
 
-  <script src="/routes/casos/js/casos.js"></script>
+  <script src="/routes/utilidad/js/scripts.js"></script>
 </body>
 </html>
