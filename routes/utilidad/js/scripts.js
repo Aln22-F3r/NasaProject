@@ -1,9 +1,9 @@
 /******************************************
  * CONFIGURACIÓN GLOBAL DE API
  ******************************************/
-const API_BASE = "http://127.0.0.1:8000"; // <— ajusta a tu backend real
+const API_BASE = "http://127.0.0.1:8000"; // <-- AJUSTA AL HOST/PUERTO DE TU BACKEND
 
-// Diccionario de parámetros disponibles (si los necesitas más adelante)
+// Diccionario de parámetros disponibles (por si luego dejas elegir más)
 const PARAMS_DICT = {
   temp_2m: "t_2m:C",
   rh_2m: "relative_humidity_2m:p",
@@ -17,12 +17,34 @@ const PARAMS_DICT = {
 
 // Endpoints del backend (GET)
 const API = {
-  grid: `${API_BASE}/api/meteo/grid`,             // ?lat=&lon=&objetivo=&espacial=&temporal=
-  timeseries: `${API_BASE}/api/meteo/timeseries`, // ?lat=&lon=&objetivo=&espacial=&temporal=
+  grid: `${API_BASE}/api/meteo/grid`,             // ?lat1=&lon1=&lat2=&lon2=&res_lat=&res_lon=&valid_time=&params[&fmt]
+  timeseries: `${API_BASE}/api/meteo/timeseries`, // ?lat=&lon=&start=&end=&step=&params
 };
 
 /******************************************
- * MOTOR DE RECOMENDACIÓN
+ * HELPERS DE FECHAS / BBOX
+ ******************************************/
+function toISO(dt) {
+  // ISO sin milisegundos
+  return new Date(dt).toISOString().split(".")[0] + "Z";
+}
+function defaultTimeRange(hoursBack = 72) {
+  const end = new Date();
+  const start = new Date(end.getTime() - hoursBack * 3600 * 1000);
+  return { start: toISO(start), end: toISO(end) };
+}
+function buildBBoxFromPoint(lat, lon, halfSpan = 0.25) {
+  // halfSpan en grados (~0.25° ≈ 25km aprox). Ajusta a lo que quieras.
+  return {
+    lat1: (lat + halfSpan).toFixed(6), // superior (lat grande)
+    lon1: (lon - halfSpan).toFixed(6), // izquierda
+    lat2: (lat - halfSpan).toFixed(6), // inferior (lat pequeña)
+    lon2: (lon + halfSpan).toFixed(6), // derecha
+  };
+}
+
+/******************************************
+ * MOTOR DE RECOMENDACIÓN (UI informativa)
  ******************************************/
 function recomendar({ objetivo, espacial, temporal }) {
   let endpoint = "timeseries";
@@ -85,9 +107,8 @@ const explicacion   = document.getElementById("explicacion");
 const varsList      = document.getElementById("vars");
 const ejemplo       = document.getElementById("ejemplo");
 
-// Contenedor de botones bajo el mapa (dos CTAs)
+// CTAs (botones debajo del mapa). Deben arrancar ocultos.
 const ctas          = document.getElementById("ctas");
-// Asegura que arranquen ocultos por si al HTML le faltó "hidden"
 if (ctas && !ctas.classList.contains("hidden")) ctas.classList.add("hidden");
 
 /******************************************
@@ -179,25 +200,22 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 let marker = null;
 let lastLatLng = null; // último punto seleccionado
 
-// Mostrar CTAs, actualizar href con lat/lon y enganchar GET fetch
 function showCTAsWithCoords(latlng) {
   if (!ctas) return;
 
   lastLatLng = latlng;
 
-  // (Opcional) añade ?lat=&lon= a cada link dentro de #ctas
+  // (opcional) añade ?lat=&lon= a los href por si luego navegas
   ctas.querySelectorAll("a").forEach(a => {
     try {
       const url = new URL(a.getAttribute("href"), window.location.origin);
       url.searchParams.set("lat", latlng.lat.toFixed(6));
       url.searchParams.set("lon", latlng.lng.toFixed(6));
       a.setAttribute("href", url.pathname + url.search);
-    } catch {
-      // rutas relativas sin origen: ignora
-    }
+    } catch {}
   });
 
-  // Engancha eventos GET al backend (una sola vez por botón)
+  // engancha eventos GET al backend (una sola vez por botón)
   attachEndpointHandlers();
 
   ctas.classList.remove("hidden");
@@ -213,13 +231,12 @@ function setPoint(latlng) {
     .bindPopup(`<b>Lat:</b> ${lat}<br><b>Lng:</b> ${lon}`)
     .openPopup();
 
-  // Mostrar botones SOLO después de elegir punto
   showCTAsWithCoords(latlng);
 }
 
 map.on("click", e => setPoint(e.latlng));
 
-// Geocoder si está cargado en la página
+// Geocoder si lo incluiste en el HTML
 if (L.Control && L.Control.geocoder) {
   L.Control.geocoder({
     defaultMarkGeocode: false,
@@ -232,12 +249,10 @@ if (L.Control && L.Control.geocoder) {
       setPoint(c);
     })
     .addTo(map);
-} else {
-  console.warn("Leaflet Control Geocoder no disponible (asegúrate de incluir sus scripts en el HTML).");
 }
 
 /******************************************
- * CTAs -> FETCH GET AL BACKEND
+ * CTAs -> FETCH GET AL BACKEND (con params correctos)
  ******************************************/
 function attachEndpointHandlers() {
   const btnGrid = ctas.querySelector('a[data-endpoint="grid"]');
@@ -250,42 +265,73 @@ function attachEndpointHandlers() {
       ev.preventDefault();
       if (!lastLatLng) { alert("Selecciona un punto en el mapa."); return; }
 
-      // Construye query
-      const params = new URLSearchParams({
-        lat: lastLatLng.lat.toFixed(6),
-        lon: lastLatLng.lng.toFixed(6),
-        objetivo:  objetivoSel?.value || "",
-        espacial:  espacialSel?.value || "",
-        temporal:  temporalSel?.value || ""
-      });
-
       const type = btn.dataset.endpoint; // "grid" | "timeseries"
-      const url  = `${API[type]}?${params.toString()}`;
+      let url = "";
+
+      if (type === "timeseries") {
+        // REQUERIDOS: lat, lon, start, end, step, params
+        const { start, end } = defaultTimeRange(72);  // últimas 72h
+        const step   = "PT1H";                         // cada 1h (usa PT9H si tu API lo pide)
+        const params = PARAMS_DICT.temp_2m || "t_2m:C";
+
+        const qs = new URLSearchParams({
+          lat: String(Number(lastLatLng.lat).toFixed(6)),
+          lon: String(Number(lastLatLng.lng).toFixed(6)),
+          start,
+          end,
+          step,
+          params
+        });
+
+        url = `${API.timeseries}?${qs.toString()}`;
+
+      } else {
+        // GRID (EJEMPLO típico). AJUSTA nombre de campos si tu backend usa otros.
+        const lat = Number(lastLatLng.lat);
+        const lon = Number(lastLatLng.lng);
+        const bbox = buildBBoxFromPoint(lat, lon, 0.25); // 0.25° ~ 25km
+
+        const res_lat    = "0.02";
+        const res_lon    = "0.02";
+        const valid_time = "now";
+        const params     = PARAMS_DICT.temp_2m || "t_2m:C";
+        // const fmt      = "png"; // si tu API lo requiere, descomenta
+
+        const qs = new URLSearchParams({
+          ...bbox,
+          res_lat,
+          res_lon,
+          valid_time,
+          params
+          // , fmt
+        });
+
+        url = `${API.grid}?${qs.toString()}`;
+      }
 
       const originalText = btn.textContent;
       btn.textContent = "Consultando...";
       btn.classList.add("opacity-70", "pointer-events-none");
 
+      console.log("[REQ]", type, url);
+
       try {
         const resp = await fetch(url, { method: "GET" });
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        if (!resp.ok) {
+          const errText = await resp.text();
+          console.error("[ERR]", resp.status, errText);
+          alert(`Error ${resp.status}:\n${errText}`);
+          return;
+        }
 
         const ct = (resp.headers.get("content-type") || "").toLowerCase();
 
         if (ct.includes("application/json")) {
           const data = await resp.json();
           console.log(`✅ Respuesta ${type}:`, data);
-
-          // Ejemplo: guardar y navegar a otra página para visualizar
-          // localStorage.setItem(`${type}_result`, JSON.stringify(data));
-          // window.location.href = (type === 'grid')
-          //   ? '/routes/mapas/html/index.html'
-          //   : '/routes/analisis/html/index.html';
-
-          alert("Solicitud completada. Revisa la consola para ver el JSON.");
-
+          alert("OK: revisa la consola para ver el JSON.");
         } else {
-          // Si es archivo (PNG/TIF/CSV...), abrir en nueva pestaña
+          // Archivo (png/tif/csv/pdf...) -> abre en nueva pestaña
           const blob = await resp.blob();
           const href = URL.createObjectURL(blob);
           window.open(href, "_blank");
@@ -301,8 +347,6 @@ function attachEndpointHandlers() {
       }
     });
 
-    // Evitar registrar múltiples veces si el usuario cambia de punto
-    btn.dataset.bound = "1";
+    btn.dataset.bound = "1"; // evita duplicar listeners
   });
 }
- 
