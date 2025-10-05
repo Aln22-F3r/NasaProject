@@ -1,8 +1,211 @@
-  body{
-   
-      background-image: url('/images/Fondo_Mapa.png'); 
-      background-size: cover;  
-      background-position: center;  
-      background-repeat: no-repeat; 
-     background-attachment: fixed;  
-         }
+:root {
+  --color-primario: #b71c1c;
+  --color-primario-hover: #8e0000;
+  --color-texto: #e2e8f0;
+  --color-texto-negro: #161616;
+  --color-texto-secundario: #94a3b8;
+  --color-card: rgba(15, 23, 42, 0.85);
+  --color-sombra: rgba(0, 0, 0, 0.5);
+
+  --borde-redondeado: 16px;
+  --ancho-maximo: 1000px;
+  --fuente-principal: 'Inter', sans-serif;
+}
+
+body.body-page {
+  background: url('/images/Fondo_Mapa.png') center/cover no-repeat fixed;
+  color: var(--color-texto);
+  font-family: var(--fuente-principal);
+  text-align: center;
+}
+
+/* TITULO */
+.titulo-principal {
+  color: var(--color-primario);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+/* BOTÓN REGRESAR */
+.boton-regresar-container {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+}
+
+.boton-regresar {
+  background-color: var(--color-primario);
+  color: white;
+  padding: 0.5rem 1.2rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  box-shadow: 0 4px 10px var(--color-sombra);
+  transition: all 0.3s ease;
+}
+
+.boton-regresar:hover {
+  background-color: var(--color-primario-hover);
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px var(--color-sombra);
+}
+
+/* TEXTOS */
+.texto-descriptivo {
+  color: var(--color-texto-secundario);
+  font-style: italic;
+  font-size: 0.9rem;
+  max-width: 800px;
+  margin-bottom: 1.5rem;
+}
+
+.resaltado {
+  color: var(--color-primario);
+  font-weight: 600;
+}
+
+.texto-coords {
+  color: #38bdf8;
+  font-family: monospace;
+  margin-bottom: 1rem;
+}
+
+/* MAPA */
+.map-container {
+  width: 100%;
+  max-width: var(--ancho-maximo);
+  height: clamp(300px, 60vh, 600px);
+  margin-bottom: 1.5rem;
+  border: 3px solid var(--color-primario);
+  border-radius: var(--borde-redondeado);
+  overflow: hidden;
+  background-color: var(--color-card);
+  box-shadow: 0 6px 20px var(--color-sombra);
+  position: relative;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+}
+
+/* BUSCADOR LEAFLET */
+.leaflet-control-geocoder input {
+  color: var(--color-texto-negro);
+  background-color: white;
+  border-radius: 8px;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid #ccc;
+}
+
+.leaflet-control-geocoder input::placeholder {
+  color: var(--color-texto-secundario);
+}
+
+/* BOTÓN INFO */
+.info-sobre-mapa {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+}
+
+.info-sobre-mapa #infoBtn {
+  background: transparent;
+  color: var(--color-primario);
+  font-weight: bold;
+  font-size: 1.2rem;
+  border: 2px solid var(--color-primario);
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.info-sobre-mapa #infoBtn:hover {
+  background-color: var(--color-primario);
+  color: var(--color-texto);
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px var(--color-sombra);
+}
+
+.info-sobre-mapa #infoPopup {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background-color: var(--color-card);
+  color: var(--color-texto);
+  padding: 1rem;
+  border-radius: var(--borde-redondeado);
+  box-shadow: 0 6px 20px var(--color-sombra);
+  display: none;
+  width: 22rem;
+  z-index: 1001;
+}
+
+.info-sobre-mapa #infoPopup p {
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+
+/* SELECTOR CALIDAD */
+.selector-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.selector-container label {
+  color: var(--color-texto);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.selector-container select {
+  background-color: white;
+  color: black;
+  border-radius: 8px;
+  padding: 0.4rem 0.8rem;
+  min-width: 150px;
+}
+
+/* BOTÓN ENVIAR */
+.boton-enviar {
+  background-color: var(--color-primario);
+  color: white;
+  padding: 0.5rem 1.2rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  box-shadow: 0 4px 10px var(--color-sombra);
+  transition: all 0.3s ease;
+  opacity: 0;
+  pointer-events: none;
+  margin-bottom: 2rem;
+}
+
+.boton-enviar.activo {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.boton-enviar:hover {
+  background-color: var(--color-primario-hover);
+  transform: scale(1.05);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .titulo-principal {
+    font-size: 1.3rem;
+  }
+
+  .map-container {
+    height: 50vh;
+  }
+}

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mapa Bivialidad</title>
+  <title>Mapa de Viabilidad Energética</title>
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -16,54 +16,51 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/>
   <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
-  <!-- Tu hoja de estilos -->
+  <!-- Estilos personalizados -->
   <link rel="stylesheet" href="/routes/mapas/css/styles.css">
 </head> 
 
-<body class="bg-black flex flex-col items-center justify-center min-h-screen  px-4">
+<body class="body-page flex flex-col items-center justify-start min-h-screen px-4 pb-12">
 
-  <h1 class="text-xl md:text-2xl text-[#b71c1c] font-bold mb-3">
-    Viabilidad de energías renovables
-  </h1> 
+  <h1 class="titulo-principal mt-4">Mapa de Viabilidad Energética Global</h1>
 
-  <div class="absolute top-6 left-6 flex items-center gap-4">
-    <a href="/routes/inicio/html/index.html"
-        class="px-4 py-2 bg-[#b71c1c] text-white rounded-full shadow-lg 
-        hover:bg-[#8e0000] hover:shadow-xl hover:scale-105
-        transition duration-300 ease-in-out">
-        Regresar
-    </a>
+  <div class="boton-regresar-container">
+    <a href="/routes/inicio/html/index.html" class="boton-regresar">Regresar</a>
   </div>
 
-  <p class="mb-2 text-gray-300 font-bold">Paso 1: Escoger una ubicación para evaluar la viabilidad.</p>
-  <p class="mb-2 text-gray-300 font-bold">Paso 2: Seleccionar la calidad de imagen (representación de temperatura).</p>
-  <p class="mb-4 text-gray-300 font-bold">Paso 3: Enviar la información en el botón.</p>
+  <p class="texto-descriptivo max-w-3xl mt-4 mb-4">
+    La imagen generada proviene de un archivo geoespacial en el que cada píxel representa un área de 
+    <span class="resaltado">2 x 2 kilómetros</span>. Cada punto contiene datos climáticos y ambientales asociados, 
+    como temperatura, radiación solar y velocidad del viento, lo que permite identificar las regiones con 
+    mayor potencial para la implementación de proyectos de energía limpia.
+  </p>
 
-  <div class="w-full max-w-3xl h-80 border-2 border-gray-300 rounded-lg shadow-md overflow-hidden mb-4">
-    <div id="map" class="h-full w-full"></div>
+  <div class="map-container relative">
+    <div id="map"></div>
+
+    <div class="info-sobre-mapa">
+      <button id="infoBtn">!</button>
+      <div id="infoPopup">
+        <p>Paso 1: Selecciona una ubicación en el mapa para analizar su potencial energético.</p>
+        <p>Paso 2: Elige la calidad de imagen.</p>
+        <p>Paso 3: Haz clic en <span class="resaltado">“Evaluar Zona”</span> para visualizar los datos de viabilidad y condiciones climáticas.</p>
+      </div>
+    </div>
   </div>
 
-  <p id="coords" class="text-lg text-blue-300 font-mono mb-4"></p>
+  <p id="coords" class="texto-coords"></p>
 
-  <div class="mb-4 w-full max-w-3xl flex items-center gap-3">
-    <label for="quality" class="text-sm text-gray-300">Calidad de imagen:</label>
-    <select id="quality" class="text-black px-3 py-2 rounded-md w-52 disabled:opacity-50" disabled>
+  <div class="selector-container">
+    <label for="quality">Calidad de imagen:</label>
+    <select id="quality" disabled>
       <option value="baja">Baja</option>
       <option value="media" selected>Media</option>
       <option value="alta">Alta</option>
     </select>
   </div>
 
-  <button
-    id="sendBtn"
-    class="bg-[#b71c1c] hover:bg-red-900 text-white px-4 py-2 rounded-full transition
-           opacity-0 pointer-events-none duration-300">
-    Enviar
-  </button>
+  <button id="sendBtn" class="boton-enviar">Enviar</button>
 
-  <!-- ✅ El script va aquí, al final del body -->
   <script src="/routes/mapas/js/script.js"></script>
-
 </body>
 </html>
- 
