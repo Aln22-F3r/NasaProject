@@ -5,53 +5,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mapa con botón dinámico</title>
 
- 
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
-
+  <!-- Geocoder -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/>
   <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-<style>
-  body{
-   
-      background-image: url('/images/Fondo_Estrellas_Azul\ \(1\).png'); 
-      background-size: cover;  
-      background-position: center;  
-      background-repeat: no-repeat; 
-     background-attachment: fixed;  
-         }
-</style>
-  </body>
 
+  <!-- Tu hoja de estilos -->
+  <link rel="stylesheet" href="/routes/mapas/css/styles.css">
 </head>
-<body class="bg-black flex flex-col items-center justify-center min-h-screen text-white px-4">
-<h1 class="text-xl md:text-2xl text-[#b71c1c] font-bold mb-3 ">
-  Viabilidad de energías renovables
-</h1>
 
-<div class="absolute top-6 left-6 flex items-center gap-4">
-    <a href="inicio.html"
+<body class="bg-black flex flex-col items-center justify-center min-h-screen text-white px-4">
+
+  <h1 class="text-xl md:text-2xl text-[#b71c1c] font-bold mb-3">
+    Viabilidad de energías renovables
+  </h1>
+
+  <div class="absolute top-6 left-6 flex items-center gap-4">
+    <a href="/routes/inicio/html/index.html"
         class="px-4 py-2 bg-[#b71c1c] text-white rounded-full shadow-lg 
         hover:bg-[#8e0000] hover:shadow-xl hover:scale-105
         transition duration-300 ease-in-out">
         Regresar
     </a>
-</div>
+  </div>
+
   <p class="mb-2 text-gray-300 font-bold">Paso 1: Escoger una ubicación para evaluar la viabilidad.</p>
   <p class="mb-2 text-gray-300 font-bold">Paso 2: Seleccionar la calidad de imagen (representación de temperatura).</p>
   <p class="mb-4 text-gray-300 font-bold">Paso 3: Enviar la información en el botón.</p>
 
-  
   <div class="w-full max-w-3xl h-80 border-2 border-gray-300 rounded-lg shadow-md overflow-hidden mb-4">
     <div id="map" class="h-full w-full"></div>
   </div>
 
-
   <p id="coords" class="text-lg text-blue-300 font-mono mb-4"></p>
-
 
   <div class="mb-4 w-full max-w-3xl flex items-center gap-3">
     <label for="quality" class="text-sm text-gray-300">Calidad de imagen:</label>
@@ -62,7 +54,6 @@
     </select>
   </div>
 
-
   <button
     id="sendBtn"
     class="bg-[#b71c1c] hover:bg-red-900 text-white px-4 py-2 rounded-full transition
@@ -70,58 +61,8 @@
     Enviar
   </button>
 
-  <script>
+  <!-- ✅ El script va aquí, al final del body -->
+  <script src="/routes/mapas/js/script.js"></script>
 
-    const map = L.map('map').setView([19.4326, -99.1332], 12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap',
-      maxZoom: 19,
-    }).addTo(map);
-
-    let marker;
-    const coordsEl = document.getElementById('coords');
-    const btn = document.getElementById('sendBtn');
-    const qualitySel = document.getElementById('quality');
-
-   
-    function setPoint(latlng) {
-      if (marker) map.removeLayer(marker);
-
-      const lat = latlng.lat.toFixed(6);
-      const lng = latlng.lng.toFixed(6);
-
-      marker = L.marker(latlng).addTo(map)
-               .bindPopup(`Lat: ${lat}<br>Lng: ${lng}`).openPopup();
-
-      coordsEl.textContent = `Lat: ${lat} | Lng: ${lng}`;
-
-     
-      btn.classList.remove('opacity-0', 'pointer-events-none');
-      btn.classList.add('opacity-100', 'pointer-events-auto');
-      qualitySel.disabled = false;
-    }
-
-    map.on('click', (e) => setPoint(e.latlng));
-
-   
-    L.Control.geocoder({
-      defaultMarkGeocode: false,
-      placeholder: 'Buscar lugar...',
-      position: 'topleft'
-    })
-    .on('markgeocode', (e) => {
-      const center = e.geocode.center;
-      const bbox = e.geocode.bbox;
-      map.fitBounds(bbox);
-      setPoint(center);
-    })
-    .addTo(map);
-
-   
-    btn.addEventListener('click', () => {
-      
-      alert('Listo para enviar al backend (coords + calidad).');
-    });
-  </script>
 </body>
 </html>

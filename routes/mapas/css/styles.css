@@ -1,0 +1,8 @@
+  body{
+   
+      background-image: url('/images/Fondo_Estrellas_Azul\ \(1\).png'); 
+      background-size: cover;  
+      background-position: center;  
+      background-repeat: no-repeat; 
+     background-attachment: fixed;  
+         }
