@@ -1,6 +1,4 @@
-/* ------------------------------------------- */
-/* Fondo existente: imagen de estrellas */
-/* ------------------------------------------- */
+/* Fondo base */
 body {
   background-image: url("/images/Fondo_Inicio.png");
   background-size: cover;
@@ -8,94 +6,82 @@ body {
   background-repeat: no-repeat;
   background-attachment: fixed;
 }
-
-/* Malla sutil encima del fondo */
 .grid-overlay {
   background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.08) 1px, transparent 0);
   background-size: 22px 22px;
   opacity: 0.18;
 }
 
-/* ------------------------------------------- */
-/* Animación del logo */
-/* ------------------------------------------- */
-@keyframes pulse-nasa {
-  0%, 100% {
-    transform: scale(1);
-    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
-  }
-  50% {
-    transform: scale(1.05);
-    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.7));
-  }
-}
-.animate-pulse-nasa {
-  animation: pulse-nasa 3s infinite ease-in-out;
-}
+/* Animaciones */
+@keyframes pulse-nasa { 0%,100%{transform:scale(1);filter:drop-shadow(0 0 5px rgba(255,255,255,.3))} 50%{transform:scale(1.05);filter:drop-shadow(0 0 15px rgba(255,255,255,.7))}}
+.animate-pulse-nasa{animation:pulse-nasa 3s infinite ease-in-out}
+@keyframes fadeUp { 0%{opacity:0;transform:translateY(16px)} 100%{opacity:1;transform:translateY(0)}}
+.anim-fade-up{animation:fadeUp .7s ease-out both}
+@keyframes slideBar {0%{transform:scaleX(0);opacity:.2}100%{transform:scaleX(1);opacity:1}}
+.anim-slide-bar{transform-origin:left;animation:slideBar .8s ease-out both}
 
-/* ------------------------------------------- */
-/* Animaciones de entrada */
-/* ------------------------------------------- */
-@keyframes fadeUp {
-  0% { opacity: 0; transform: translateY(16px) }
-  100% { opacity: 1; transform: translateY(0) }
+/* Borde animado botón */
+@keyframes borderFlow {0%{background-position:0% 50%}100%{background-position:400% 50%}}
+.btn-border-anim{position:relative;overflow:hidden;z-index:0}
+.btn-border-anim::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;padding:2px;
+  background:linear-gradient(90deg,#ff4b4b,#ffffff,#ff4b4b,#ff4b4b);background-size:400% 400%;
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;animation:borderFlow 6s ease-in-out infinite;animation-play-state:paused;opacity:.6;z-index:-1
 }
-.anim-fade-up { animation: fadeUp 0.7s ease-out both; }
-
-/* Subrayado deslizante del título */
-@keyframes slideBar {
-  0% { transform: scaleX(0); opacity: 0.2 }
-  100% { transform: scaleX(1); opacity: 1 }
-}
-.anim-slide-bar {
-  transform-origin: left;
-  animation: slideBar 0.8s ease-out both;
-}
-
-/* ------------------------------------------- */
-/* Borde luminoso animado (versión suave) */
-/* ------------------------------------------- */
-@keyframes borderFlow {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 400% 50%; }
-}
-
-.btn-border-anim {
-  position: relative;
-  overflow: hidden;
-  z-index: 0;
-}
-
-.btn-border-anim::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 2px;
-  background: linear-gradient(90deg, #ff4b4b, #ffffff, #ff4b4b, #ff4b4b);
-  background-size: 400% 400%;
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
-  animation: borderFlow 6s ease-in-out infinite;
-  animation-play-state: paused; /* Pausada por defecto */
-  opacity: 0.6;
-  z-index: -1;
-}
-
-/* Activa animación solo al hover o focus */
 button.btn-border-anim:hover::before,
 button.btn-border-anim:focus-visible::before,
 a.btn-border-anim:hover::before,
-a.btn-border-anim:focus-visible::before {
-  animation-play-state: running;
+a.btn-border-anim:focus-visible::before{animation-play-state:running}
+
+/* Accesibilidad */
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+
+/* ====== NUEVO: badges, CTAs y expansión ====== */
+.badge-ts{background:rgba(59,130,246,.15);color:#93c5fd;border:1px solid #1d4ed8}
+.badge-grid{background:rgba(16,185,129,.15);color:#86efac;border:1px solid #065f46}
+
+.expand{transition:max-height .35s ease, opacity .25s ease}
+.expand.show{max-height:200px;opacity:1}
+
+.btn-cta{
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:.8rem 1.2rem;border-radius:9999px;font-weight:600;
+  border:1px solid #374151;background:rgba(255,255,255,.06);color:#fff;
+  transition:transform .15s ease, background .15s ease, border-color .15s ease
+}
+.btn-cta:hover{transform:translateY(-1px);background:rgba(255,255,255,.12)}
+.btn-cta.recomendada{background:#b71c1c;border-color:#7f1d1d}
+.btn-cta.recomendada:hover{background:#8e0000}
+
+/* Cards predefinidas */
+.case-card{background:rgba(0,0,0,.55);border:1px solid #374151;border-radius:1rem;padding:1rem;transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease}
+.case-card:hover{transform:translateY(-2px);border-color:#4b5563;box-shadow:0 10px 24px rgba(0,0,0,.25)}
+.case-title{font-weight:700;margin-bottom:.25rem}
+.case-text{color:#d1d5db;font-size:.95rem;margin-bottom:.5rem}
+.case-chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.8rem}
+.chip{font-size:.75rem;padding:.25rem .5rem;border-radius:9999px;border:1px solid #374151;background:rgba(255,255,255,.06);color:#e5e7eb}
+.case-btn{font-weight:600;font-size:.875rem;padding:.5rem .8rem;border-radius:.75rem;background:#b71c1c;color:#fff;border:1px solid #7f1d1d;transition:transform .15s ease, background .15s ease}
+.case-btn:hover{background:#8e0000;transform:translateY(-1px)}
+.case-btn:focus-visible{outline:2px solid rgba(248,113,113,.6);outline-offset:2px}
+select:focus-visible{outline:2px solid rgba(248,113,113,.6);outline-offset:2px}
+
+
+/* Quitar halo por defecto en anchors/botones */
+.btn-cta {
+  outline: none;
+  box-shadow: none;
+  -webkit-tap-highlight-color: transparent; /* iOS */
+}
+.btn-cta:focus,
+.btn-cta:active {
+  outline: none;
+  box-shadow: none;
 }
 
-/* ------------------------------------------- */
-/* Accesibilidad */
-/* ------------------------------------------- */
-@media (prefers-reduced-motion: reduce) {
-  * { animation: none !important; transition: none !important; }
+/* Si quieres un focus accesible pero sutil, usa esto en lugar de quitarlo: */
+.btn-cta:focus-visible {
+  outline: 2px solid rgba(248,113,113,.6); /* rojo suave */
+  outline-offset: 2px;
 }
+
