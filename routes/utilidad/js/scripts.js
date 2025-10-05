@@ -9,18 +9,37 @@ function recomendar({ objetivo, espacial, temporal }) {
     endpoint = (espacial === 'punto') ? 'timeseries' : 'grid';
     confianza = (espacial === 'punto') ? 0.9 : 0.8;
   }
-  if (objetivo === 'comparar') { endpoint = (espacial === 'punto') ? 'timeseries' : 'grid'; confianza = 0.8; }
-  if (objetivo === 'sitio' && espacial === 'punto') { endpoint = 'timeseries'; confianza = 0.9; }
+  if (objetivo === 'comparar') {
+    endpoint = (espacial === 'punto') ? 'timeseries' : 'grid';
+    confianza = 0.8;
+  }
+  if (objetivo === 'sitio' && espacial === 'punto') {
+    endpoint = 'timeseries';
+    confianza = 0.9;
+  }
 
   const catalogo = {
     timeseries: {
       badgeClass: 'badge-ts',
-      titulo: 'Analisis de datos',
-      vars: ['Temperatura del aire a 2 metros sobre la superficie terrestre, en grados Celsius', 'Velocidad del viento a 10 m de altura sobre el terreno, en metros por segundo.', 'cantidad total de radiación solar recibida en una superficie horizontal']
+      titulo: 'Análisis de datos',
+      vars: [
+        'Temperatura del aire a 2 m [°C]',
+        'Velocidad del viento a 10 m [m/s]',
+        'Radiación solar global en horizontal [J/m²]'
+      ]
+    },
+    grid: {
+      badgeClass: 'badge-grid',
+      titulo: 'Mapa',
+      vars: [
+        'Mapa de temperatura superficial',
+        'Campo de viento a 10 m',
+        'Irradiancia/insolación por píxel en bounding box'
+      ]
     }
   };
 
-  const rec = catalogo[endpoint];
+  const rec = catalogo[endpoint] ?? catalogo.timeseries;
   return { endpoint, confianza, ...rec };
 }
 
@@ -55,21 +74,21 @@ function renderRec(r) {
 
   if (explicacion) {
     explicacion.textContent =
-      r.endpoint === 'Mapa'
+      r.endpoint === 'grid'
         ? 'Recomendado Mapa: necesitas un campo espacial continuo para generar mapas o comparar áreas.'
-        : 'Recomendado Analisis de datos: necesitas una señal temporal precisa en uno o pocos puntos.';
+        : 'Recomendado Análisis de datos: necesitas una señal temporal precisa en uno o pocos puntos.';
   }
 
   if (varsList) {
     varsList.innerHTML = '';
-    r.vars.forEach(v => {
+    (r.vars || []).forEach(v => {
       const li = document.createElement('li');
       li.textContent = v;
       varsList.appendChild(li);
     });
   }
 
-  if (ejemplo) ejemplo.textContent = r.ejemplo;
+  if (ejemplo) ejemplo.textContent = r.ejemplo || '';
 
   // CTAs
   if (ctaMapa) ctaMapa.classList.toggle('recomendada', r.endpoint === 'grid');
@@ -93,14 +112,14 @@ if (btnRec) {
 if (form) {
   form.addEventListener('reset', () => {
     setTimeout(() => {
-      if (panel) panel.classList.add('hidden');
-      if (ejemplo) ejemplo.textContent = '';
-      if (varsList) varsList.innerHTML = '';
+      panel?.classList.add('hidden');
+      ejemplo && (ejemplo.textContent = '');
+      varsList && (varsList.innerHTML = '');
       if (badgeEndpoint) { badgeEndpoint.textContent = ''; badgeEndpoint.className = ''; }
-      if (badgeConf) badgeConf.textContent = '';
-      if (explicacion) explicacion.textContent = '';
-      if (ctaMapa) ctaMapa.classList.toggle('recomendada', r.endpoint === 'grid');
-      if (ctaAnalisis) ctaAnalisis.classList.toggle('recomendada', r.endpoint === 'timeseries');
+      badgeConf && (badgeConf.textContent = '');
+      explicacion && (explicacion.textContent = '');
+      ctaMapa?.classList.remove('recomendada');
+      ctaAnalisis?.classList.remove('recomendada');
     }, 0);
   });
 }
@@ -126,42 +145,42 @@ document.querySelectorAll('.case-btn').forEach(btn => {
   });
 });
 
-  // ===== Mapa principal =====
-  const map = L.map("map").setView([19.4326, -99.1332], 12);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "© OpenStreetMap contributors", maxZoom: 19
-  }).addTo(map);
+// ===== Mapa principal =====
+const map = L.map("map").setView([19.4326, -99.1332], 12);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution: "© OpenStreetMap contributors", maxZoom: 19
+}).addTo(map);
 
-  let marker = null;
-  function setPoint(latlng) {
-    if (marker) map.removeLayer(marker);
-    const lat = latlng.lat.toFixed(6);
-    const lon = latlng.lng.toFixed(6);
-    marker = L.marker(latlng).addTo(map)
-      .bindPopup(`<b>Lat:</b> ${lat}<br><b>Lng:</b> ${lon}`).openPopup();
-    coordsEl.textContent = `📍 Lat: ${lat} | Lng: ${lon}`;
-    sendBtn.classList.add("activo");
+let marker = null;
+function setPoint(latlng) {
+  if (marker) map.removeLayer(marker);
+  const lat = latlng.lat.toFixed(6);
+  const lon = latlng.lng.toFixed(6);
+  marker = L.marker(latlng).addTo(map)
+    .bindPopup(`<b>Lat:</b> ${lat}<br><b>Lng:</b> ${lon}`).openPopup();
+  coordsEl.textContent = `📍 Lat: ${lat} | Lng: ${lon}`;
+  sendBtn.classList.add("activo");
+}
+map.on("click", e => setPoint(e.latlng));
+
+L.Control.geocoder({ defaultMarkGeocode: false, placeholder: "Buscar lugar...", position: "topleft" })
+  .on("markgeocode", e => { const c = e.geocode.center; map.fitBounds(e.geocode.bbox); setPoint(c); })
+  .addTo(map);
+
+infoBtn?.addEventListener("click", () => {
+  const vis = infoPopup.style.display === "block";
+  infoPopup.style.display = vis ? "none" : "block";
+});
+
+// ===== Enviar =====
+sendBtn.addEventListener("click", async () => {
+  try {
+    if (!marker) { alert("Selecciona un punto en el mapa."); return; }
+    const lat = +marker.getLatLng().lat.toFixed(6);
+    const lon = +marker.getLatLng().lng.toFixed(6);
+    await loadGeoTiff(lat, lon);
+  } catch (e) {
+    console.error("Error en Enviar:", e);
+    alert(e.message);
   }
-  map.on("click", e => setPoint(e.latlng));
-
-  L.Control.geocoder({ defaultMarkGeocode: false, placeholder: "Buscar lugar...", position: "topleft" })
-    .on("markgeocode", e => { const c = e.geocode.center; map.fitBounds(e.geocode.bbox); setPoint(c); })
-    .addTo(map);
-
-  infoBtn?.addEventListener("click", () => {
-    const vis = infoPopup.style.display === "block";
-    infoPopup.style.display = vis ? "none" : "block";
-  });
-
-    // ===== Enviar =====
-    sendBtn.addEventListener("click", async () => {
-      try {
-        if (!marker) { alert("Selecciona un punto en el mapa."); return; }
-        const lat = +marker.getLatLng().lat.toFixed(6);
-        const lon = +marker.getLatLng().lng.toFixed(6);
-        await loadGeoTiff(lat, lon);
-      } catch (e) {
-        console.error("Error en Enviar:", e);
-        alert(e.message);
-      }
-    });
+});
