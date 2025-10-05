@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>SatelitLeo - Casos de uso</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/routes/inicio/css/styles.css">
+  <link rel="stylesheet" href="/routes/casos/css/casos.css">
+</head>
+<body class="min-h-screen text-white font-sans relative overflow-x-hidden">
+
+  <!-- Fondo -->
+  <div class="pointer-events-none fixed inset-0 -z-10">
+    <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60"></div>
+    <div class="absolute inset-0 grid-overlay"></div>
+  </div>
+
+  <header class="px-6 pt-8 max-w-6xl mx-auto">
+    <a href="/routes/inicio/html/index.html" class="text-sm text-gray-300 hover:text-white underline">← Volver al inicio</a>
+  </header>
+
+  <main class="px-6 py-10 max-w-6xl mx-auto space-y-10">
+    <!-- Hero -->
+    <section class="space-y-4">
+      <h1 class="text-3xl md:text-5xl font-extrabold drop-shadow anim-fade-up">Casos de uso</h1>
+      <p class="text-gray-300 text-lg md:text-xl max-w-3xl anim-fade-up" style="animation-delay:120ms">
+        Selecciona un escenario. Te indicamos el endpoint óptimo (<span class="text-white font-semibold">Time Series</span> o <span class="text-white font-semibold">Grid</span>), las variables típicas y un ejemplo de consulta.
+      </p>
+    </section>
+
+    <!-- Asistente -->
+    <section class="bg-black/70 w-full rounded-2xl shadow-lg border border-gray-700 backdrop-blur-sm p-6 space-y-6 anim-fade-up" style="animation-delay:200ms">
+      <h2 class="text-xl md:text-2xl font-semibold">Asistente de recomendación</h2>
+
+      <!-- Form: habilita reset nativo -->
+      <form id="formCasos" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Objetivo</label>
+            <select id="objetivo" name="objetivo" class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-600/60">
+              <option value="sitio" selected>Evaluar un sitio puntual</option>
+              <option value="mapa">Mapear un área</option>
+              <option value="hist">Analizar histórico</option>
+              <option value="now">Monitoreo en tiempo real</option>
+              <option value="comparar">Comparar zonas</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Alcance espacial</label>
+            <select id="espacial" name="espacial" class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-600/60">
+              <option value="punto" selected>Punto</option>
+              <option value="poligono">Área / bounding box</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Resolución temporal</label>
+            <select id="temporal" name="temporal" class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-600/60">
+              <option value="min" selected>Minutal/horaria</option>
+              <option value="dia">Diaria</option>
+              <option value="mes">Mensual</option>
+              <option value="hist">Rango histórico</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+          <button id="recomendar" type="button"
+            class="relative inline-flex items-center justify-center px-8 py-4 rounded-full font-semibold bg-[#b71c1c] text-white shadow-lg transition
+                   hover:scale-105 hover:bg-[#8e0000] focus:outline-none focus:ring-2 focus:ring-red-600/60 btn-border-anim">
+            Obtener recomendación
+          </button>
+
+          <!-- reset nativo -->
+          <button id="limpiar" type="reset"
+            class="px-5 py-2 rounded-full font-semibold bg-white/10 text-white hover:bg-white/20 border border-gray-700">
+            Limpiar
+          </button>
+        </div>
+
+        <!-- Resultados -->
+        <div id="resultado" class="hidden rounded-xl border border-gray-700 bg-black/50 p-5">
+          <div class="flex items-center gap-2 mb-3">
+            <span id="badgeEndpoint" class="inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold"></span>
+            <span id="badgeConf" class="text-xs text-gray-400"></span>
+          </div>
+          <p id="explicacion" class="text-gray-300 mb-4"></p>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="space-y-2">
+              <h3 class="font-semibold">Variables sugeridas</h3>
+              <ul id="vars" class="list-disc list-inside text-gray-300 text-sm"></ul>
+            </div>
+            <div class="space-y-2">
+              <h3 class="font-semibold">Ejemplo de consulta</h3>
+              <pre id="ejemplo" class="text-xs bg-black/60 border border-gray-700 rounded-lg p-3 overflow-x-auto"></pre>
+            </div>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <!-- Casos predefinidos -->
+    <section class="space-y-4">
+      <h2 class="text-xl md:text-2xl font-semibold anim-fade-up">Casos frecuentes</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <article class="case-card">
+          <h3 class="case-title">Radiación solar para fotovoltaica</h3>
+          <p class="case-text">Estimación de potencial solar por zona para dimensionamiento preliminar.</p>
+          <div class="case-chips"><span class="chip">Grid</span><span class="chip">Área</span><span class="chip">Horaria</span></div>
+          <button class="case-btn" data-case="pv">Ver recomendación</button>
+        </article>
+        <article class="case-card">
+          <h3 class="case-title">Viento para eólica en sitio</h3>
+          <p class="case-text">Validación de recurso eólico en un punto con serie histórica.</p>
+          <div class="case-chips"><span class="chip">Time Series</span><span class="chip">Punto</span><span class="chip">Histórico</span></div>
+          <button class="case-btn" data-case="wind">Ver recomendación</button>
+        </article>
+        <article class="case-card">
+          <h3 class="case-title">Mapa de temperatura superficial</h3>
+          <p class="case-text">Mapa temático para condiciones térmicas actuales.</p>
+          <div class="case-chips"><span class="chip">Grid</span><span class="chip">Área</span><span class="chip">Actual</span></div>
+          <button class="case-btn" data-case="temp">Ver recomendación</button>
+        </article>
+      </div>
+    </section>
+
+    <!-- CTA inferior -->
+    <section class="flex items-center justify-between bg-black/70 rounded-2xl border border-gray-700 backdrop-blur-sm p-6">
+      <div>
+        <p class="text-lg md:text-xl">¿Listo para visualizar?</p>
+        <p class="text-gray-400 text-sm">Abre el mapa y prueba el endpoint recomendado.</p>
+      </div>
+      <a href="/routes/mapas/html/index.html"
+         class="relative inline-flex items-center justify-center px-4 py-4 rounded-full font-semibold bg-[#b71c1c] text-white shadow-lg transition
+                hover:scale-105 hover:bg-[#8e0000] focus:outline-none focus:ring-2 focus:ring-red-600/60 btn-border-anim">
+        Ir al mapa
+      </a>
+    </section>
+  </main>
+
+  <footer class="w-full py-8 text-center">
+    <hr class="w-1/2 max-w-lg border-t border-gray-700 mx-auto mb-6">
+    <a href="/routes/aboutUs/html/index.html" class="text-gray-300 hover:text-white hover:underline">Sobre Nosotros</a>
+    <p class="text-gray-500 text-xs mt-4">© 2025 SatelitLeo Project.</p>
+  </footer>
+
+  <script src="/routes/casos/js/casos.js"></script>
+</body>
+</html>
