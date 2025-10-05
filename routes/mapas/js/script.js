@@ -1,20 +1,20 @@
-// Inicializar mapa
-const map = L.map('map').setView([19.4326, -99.1332], 12);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap',
+const map = L.map("map").setView([19.4326, -99.1332], 12);
+
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution: "© OpenStreetMap contributors",
   maxZoom: 19,
 }).addTo(map);
 
-// Elementos del DOM
-let marker;
-const coordsEl = document.getElementById('coords');
-const sendBtn = document.getElementById('sendBtn');
-const qualitySel = document.getElementById('quality');
-const infoBtn = document.getElementById('infoBtn');
-const infoPopup = document.getElementById('infoPopup');
+let marker = null;
+const coordsEl = document.getElementById("coords");
+const sendBtn = document.getElementById("sendBtn");
+const qualitySel = document.getElementById("quality");
+const infoBtn = document.getElementById("infoBtn");
+const infoPopup = document.getElementById("infoPopup");
+const mapContainer = document.querySelector(".map-container");
+const mapaTif = document.getElementById("mapaTif");
 
-// Función para colocar marcador y actualizar UI
 function setPoint(latlng) {
   if (marker) map.removeLayer(marker);
 
@@ -23,37 +23,92 @@ function setPoint(latlng) {
 
   marker = L.marker(latlng)
     .addTo(map)
-    .bindPopup(`Lat: ${lat}<br>Lng: ${lng}`)
+    .bindPopup(`<b>Lat:</b> ${lat}<br><b>Lng:</b> ${lng}`)
     .openPopup();
 
-  coordsEl.textContent = `Lat: ${lat} | Lng: ${lng}`;
-  sendBtn.classList.add('activo');
-  qualitySel.disabled = false;
+  coordsEl.textContent = `📍 Lat: ${lat} | Lng: ${lng}`;
+
+  sendBtn.classList.add("activo");
+  if (qualitySel) qualitySel.disabled = false;
 }
 
-// Eventos del mapa
-map.on('click', (e) => setPoint(e.latlng));
+map.on("click", (e) => setPoint(e.latlng));
 
-L.Control.geocoder({ defaultMarkGeocode: false, placeholder: 'Buscar lugar...', position: 'topleft' })
-  .on('markgeocode', (e) => {
+L.Control.geocoder({
+  defaultMarkGeocode: false,
+  placeholder: "Buscar lugar...",
+  position: "topleft",
+})
+  .on("markgeocode", (e) => {
     const center = e.geocode.center;
     map.fitBounds(e.geocode.bbox);
     setPoint(center);
   })
   .addTo(map);
 
-// Enviar datos
-sendBtn.addEventListener('click', () => {
-  if (!marker) return alert('Selecciona primero una posición en el mapa.');
+// Cambiar color del texto del buscador a negro
+setTimeout(() => {
+  const input = document.querySelector(
+    ".leaflet-control-geocoder-form input"
+  );
+  if (input) {
+    input.style.color = "black";
+    input.style.fontWeight = "500";
+  }
+}, 500);
+
+infoBtn.addEventListener("click", () => {
+  const isVisible = infoPopup.style.display === "block";
+  infoPopup.style.display = isVisible ? "none" : "block";
+});
+
+sendBtn.addEventListener("click", () => {
+  if (!marker)
+    return alert("⚠️ Selecciona primero una posición en el mapa.");
 
   const lat = marker.getLatLng().lat.toFixed(6);
   const lng = marker.getLatLng().lng.toFixed(6);
-  const quality = qualitySel.value;
+  const quality = qualitySel ? qualitySel.value : "No especificada";
 
-  alert(`Listo para enviar al backend:\nLat: ${lat}\nLng: ${lng}\nCalidad: ${quality}`);
-});
+  // Simular datos de la API
+  const datos = {
+    temperatura: (10 + Math.random() * 10).toFixed(1),
+    radiacion: (400 + Math.random() * 300).toFixed(0),
+    viento: (5 + Math.random() * 15).toFixed(1),
+  };
 
-// Mostrar/Ocultar popup de info
-infoBtn.addEventListener('click', () => {
-  infoPopup.style.display = infoPopup.style.display === 'block' ? 'none' : 'block';
+  // Minimizar mapa principal
+  mapContainer.classList.add("minimizado");
+  
+  // Mostrar mapa TIF
+  mapaTif.classList.remove("hidden");
+  mapaTif.classList.add("visible");
+
+  // Mostrar contenedor de resultados
+  const resultados = document.getElementById("resultados");
+  resultados.classList.remove("hidden");
+
+  // Actualizar información textual
+  document.getElementById(
+    "infoSeleccion"
+  ).textContent = `📍 Ubicación: Lat ${lat}, Lng ${lng} (Calidad: ${quality})`;
+  document.getElementById("tempDato").textContent = `${datos.temperatura} °C`;
+  document.getElementById("radDato").textContent = `${datos.radiacion} W/m²`;
+  document.getElementById("vientoDato").textContent = `${datos.viento} km/h`;
+
+  // Crear mini-mapa con el punto seleccionado
+  const miniMapContainer = document.getElementById("mapaMini");
+  miniMapContainer.innerHTML = "";
+
+  const miniMap = L.map("mapaMini", {
+    zoomControl: false,
+    attributionControl: false,
+    dragging: false,
+    scrollWheelZoom: false,
+  }).setView([lat, lng], 10);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(
+    miniMap
+  );
+  L.marker([lat, lng]).addTo(miniMap);
 });
