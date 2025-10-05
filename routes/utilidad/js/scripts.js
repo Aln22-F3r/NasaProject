@@ -1,4 +1,4 @@
-// Motor simple de recomendación Grid vs Time Series
+// --- Motor de recomendación ---
 function recomendar({ objetivo, espacial, temporal }) {
   let endpoint = 'timeseries';
   let confianza = 0.75;
@@ -15,8 +15,8 @@ function recomendar({ objetivo, espacial, temporal }) {
   const catalogo = {
     timeseries: {
       badgeClass: 'badge-ts',
-      titulo: 'Time Series',
-      vars: ['temperature_2m:C', 'wind_speed_10m:ms', 'global_horizontal_irradiance:Wm2'],
+      titulo: 'Analisis de datos',
+      vars: ['Temperatura del aire a 2 metros sobre la superficie terrestre, en grados Celsius', 'Velocidad del viento a 10 m de altura sobre el terreno, en metros por segundo.', 'cantidad total de radiación solar recibida en una superficie horizontal'],
       ejemplo:
 `GET https://api.meteomatics.com/{start}--{end}:{step}/{parameter}/{lat},{lon}/json
 Auth: user:pass
@@ -26,8 +26,8 @@ Ejemplo:
     },
     grid: {
       badgeClass: 'badge-grid',
-      titulo: 'Grid',
-      vars: ['temperature_2m:C', 'wind_speed_10m:ms', 'direct_normal_irradiance:Wm2'],
+      titulo: 'Mapa',
+      vars: ['Temperatura del aire a 2 metros sobre la superficie terrestre, en grados Celsius', 'Velocidad del viento a 10 m de altura sobre el terreno, en metros por segundo.', 'Cantidad de radiación solar directa recibida por unidad de superficie orientada perpendicularmente a los rayos solares, medida en W/m²'],
       ejemplo:
 `GET https://api.meteomatics.com/{valid_time}/{parameter}/{lat1},{lon1}:{lat2},{lon2}:{res_lat},{res_lon}/json
 Auth: user:pass
@@ -41,7 +41,7 @@ Ejemplo:
   return { endpoint, confianza, ...rec };
 }
 
-// DOM
+// --- DOM refs (con guards) ---
 const form = document.getElementById('formCasos');
 const objetivoSel = document.getElementById('objetivo');
 const espacialSel = document.getElementById('espacial');
@@ -55,65 +55,91 @@ const explicacion = document.getElementById('explicacion');
 const varsList = document.getElementById('vars');
 const ejemplo = document.getElementById('ejemplo');
 
-// Render
+const ctas = document.getElementById('ctas');
+const ctaMapa = document.getElementById('ctaMapa');
+const ctaAnalisis = document.getElementById('ctaAnalisis');
+
+// --- Render seguro ---
 function renderRec(r) {
-  panel.classList.remove('hidden');
+  if (panel) panel.classList.remove('hidden');
 
-  badgeEndpoint.className = `inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold ${r.badgeClass}`;
-  badgeEndpoint.textContent = r.titulo;
+  if (badgeEndpoint) {
+    badgeEndpoint.className = `inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold ${r.badgeClass}`;
+    badgeEndpoint.textContent = r.titulo;
+  }
+  if (badgeConf) badgeConf.textContent = `Confianza: ${(r.confianza*100).toFixed(0)}%`;
 
-  badgeConf.textContent = `Confianza: ${(r.confianza*100).toFixed(0)}%`;
+  if (explicacion) {
+    explicacion.textContent =
+      r.endpoint === 'Mapa'
+        ? 'Recomendado Mapa: necesitas un campo espacial continuo para generar mapas o comparar áreas.'
+        : 'Recomendado Analisis de datos: necesitas una señal temporal precisa en uno o pocos puntos.';
+  }
 
-  explicacion.textContent =
-    r.endpoint === 'grid'
-      ? 'Recomendado Grid: necesitas un campo espacial continuo para generar mapas o comparar áreas.'
-      : 'Recomendado Time Series: necesitas una señal temporal precisa en uno o pocos puntos.';
+  if (varsList) {
+    varsList.innerHTML = '';
+    r.vars.forEach(v => {
+      const li = document.createElement('li');
+      li.textContent = v;
+      varsList.appendChild(li);
+    });
+  }
 
-  varsList.innerHTML = '';
-  r.vars.forEach(v => {
-    const li = document.createElement('li');
-    li.textContent = v;
-    varsList.appendChild(li);
-  });
+  if (ejemplo) ejemplo.textContent = r.ejemplo;
 
-  ejemplo.textContent = r.ejemplo;
+  // CTAs
+  if (ctaMapa) ctaMapa.classList.toggle('recomendada', r.endpoint === 'grid');
+  if (ctaAnalisis) ctaAnalisis.classList.toggle('recomendada', r.endpoint === 'timeseries');
+  if (ctas) ctas.classList.add('show');
 }
 
-// Eventos
-btnRec.addEventListener('click', () => {
-  const datos = {
-    objetivo: objetivoSel.value,
-    espacial: espacialSel.value,
-    temporal: temporalSel.value
-  };
-  const r = recomendar(datos);
-  renderRec(r);
-});
+// --- Eventos ---
+if (btnRec) {
+  btnRec.addEventListener('click', () => {
+    const datos = {
+      objetivo: objetivoSel?.value,
+      espacial: espacialSel?.value,
+      temporal: temporalSel?.value
+    };
+    const r = recomendar(datos);
+    renderRec(r);
+  });
+}
 
-// Reset nativo del form + limpiar panel
-form.addEventListener('reset', () => {
-  setTimeout(() => {
-    panel.classList.add('hidden');
-    ejemplo.textContent = '';
-    varsList.innerHTML = '';
-    badgeEndpoint.textContent = '';
-    badgeEndpoint.className = '';
-    badgeConf.textContent = '';
-    explicacion.textContent = '';
-  }, 0);
-});
+// Reset nativo + limpiar
+if (form) {
+  form.addEventListener('reset', () => {
+    setTimeout(() => {
+      if (panel) panel.classList.add('hidden');
+      if (ejemplo) ejemplo.textContent = '';
+      if (varsList) varsList.innerHTML = '';
+      if (badgeEndpoint) { badgeEndpoint.textContent = ''; badgeEndpoint.className = ''; }
+      if (badgeConf) badgeConf.textContent = '';
+      if (explicacion) explicacion.textContent = '';
+      if (ctas) ctas.classList.remove('show');
+      if (ctaMapa) ctaMapa.classList.remove('recomendada');
+      if (ctaAnalisis) ctaAnalisis.classList.remove('recomendada');
+    }, 0);
+  });
+}
 
-// Tarjetas predefinidas
+// Presets de tarjetas
 document.querySelectorAll('.case-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const tipo = btn.dataset.case;
     const presets = {
-      pv: { objetivo:'mapa', espacial:'poligono', temporal:'min' },
-      wind:{ objetivo:'hist', espacial:'punto', temporal:'hist' },
-      temp:{ objetivo:'mapa', espacial:'poligono', temporal:'min' }
+      pv:   { objetivo:'mapa', espacial:'poligono', temporal:'min' },
+      wind: { objetivo:'hist',  espacial:'punto',    temporal:'hist' },
+      temp: { objetivo:'mapa',  espacial:'poligono', temporal:'min' }
     };
     const r = recomendar(presets[tipo]);
     renderRec(r);
-    window.scrollTo({ top: document.getElementById('resultado').getBoundingClientRect().top + window.scrollY - 100, behavior: 'smooth' });
+    const res = document.getElementById('resultado');
+    if (res) {
+      window.scrollTo({
+        top: res.getBoundingClientRect().top + window.scrollY - 100,
+        behavior: 'smooth'
+      });
+    }
   });
 });

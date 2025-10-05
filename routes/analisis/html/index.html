@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis Climático Interactivo</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Análisis de Potencial para Energías Renovables</h1>
+        <p>Selecciona un punto en el mapa para obtener datos. (Actualmente usando datos de muestra para CDMX)</p>
+    </header>
+
+    <main>
+        <div id="map"></div>
+        
+        <section id="dashboard">
+            <div id="info" class="card">
+                <h2>Resumen Anual</h2>
+                <p><strong>Ubicación:</strong> <span id="ubicacion">19.43, -99.13</span></p>
+                <div id="resumen-anual">
+                    </div>
+                <div id="acciones">
+                    <button id="descargarCsvBtn">Descargar Resumen en CSV</button>
+                </div>
+            </div>
+
+            <div id="graficos" class="card">
+                <h2>Análisis Mensual</h2>
+                <canvas id="graficoViabilidad"></canvas>
+            </div>
+        </section>
+    </main>
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script src="js/data.js"></script>         <script src="js/analysis.js"></script>     <script src="js/app.js"></script>          </body>
+</html>
