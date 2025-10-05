@@ -1,186 +1,308 @@
-// --- Motor de recomendación ---
+/******************************************
+ * CONFIGURACIÓN GLOBAL DE API
+ ******************************************/
+const API_BASE = "http://127.0.0.1:8000"; // <— ajusta a tu backend real
+
+// Diccionario de parámetros disponibles (si los necesitas más adelante)
+const PARAMS_DICT = {
+  temp_2m: "t_2m:C",
+  rh_2m: "relative_humidity_2m:p",
+  dew_2m: "dew_point_2m:C",
+  precip_1h: "precip_1h:mm",
+  wind_10m: "wind_speed_10m:ms",
+  wind_100m: "wind_speed_100m:ms",
+  msl: "msl_pressure:hPa",
+  ghi: "global_horizontal_irradiance:Wm2",
+};
+
+// Endpoints del backend (GET)
+const API = {
+  grid: `${API_BASE}/api/meteo/grid`,             // ?lat=&lon=&objetivo=&espacial=&temporal=
+  timeseries: `${API_BASE}/api/meteo/timeseries`, // ?lat=&lon=&objetivo=&espacial=&temporal=
+};
+
+/******************************************
+ * MOTOR DE RECOMENDACIÓN
+ ******************************************/
 function recomendar({ objetivo, espacial, temporal }) {
-  let endpoint = 'timeseries';
+  let endpoint = "timeseries";
   let confianza = 0.75;
 
-  if (espacial === 'poligono') { endpoint = 'grid'; confianza = 0.85; }
-  if (objetivo === 'mapa') { endpoint = 'grid'; confianza = 0.9; }
-  if (objetivo === 'hist' || objetivo === 'now') {
-    endpoint = (espacial === 'punto') ? 'timeseries' : 'grid';
-    confianza = (espacial === 'punto') ? 0.9 : 0.8;
+  if (espacial === "poligono") { endpoint = "grid"; confianza = 0.85; }
+  if (objetivo === "mapa")     { endpoint = "grid"; confianza = 0.9; }
+  if (objetivo === "hist" || objetivo === "now") {
+    endpoint = (espacial === "punto") ? "timeseries" : "grid";
+    confianza = (espacial === "punto") ? 0.9 : 0.8;
   }
-  if (objetivo === 'comparar') {
-    endpoint = (espacial === 'punto') ? 'timeseries' : 'grid';
+  if (objetivo === "comparar") {
+    endpoint = (espacial === "punto") ? "timeseries" : "grid";
     confianza = 0.8;
   }
-  if (objetivo === 'sitio' && espacial === 'punto') {
-    endpoint = 'timeseries';
-    confianza = 0.9;
+  if (objetivo === "sitio" && espacial === "punto") {
+    endpoint = "timeseries"; confianza = 0.9;
   }
 
   const catalogo = {
     timeseries: {
-      badgeClass: 'badge-ts',
-      titulo: 'Análisis de datos',
+      badgeClass: "badge-ts",
+      titulo: "Analisis de datos",
       vars: [
-        'Temperatura del aire a 2 m [°C]',
-        'Velocidad del viento a 10 m [m/s]',
-        'Radiación solar global en horizontal [J/m²]'
-      ]
+        "Temperatura 2m (°C)",
+        "Viento 10m (m/s)",
+        "Irradiancia global horizontal (W/m²)"
+      ],
+      ejemplo: ""
     },
     grid: {
-      badgeClass: 'badge-grid',
-      titulo: 'Mapa',
+      badgeClass: "badge-grid",
+      titulo: "Mapa",
       vars: [
-        'Mapa de temperatura superficial',
-        'Campo de viento a 10 m',
-        'Irradiancia/insolación por píxel en bounding box'
-      ]
+        "Temperatura 2m (°C)",
+        "Viento 10m (m/s)",
+        "Irradiancia directa normal (W/m²)"
+      ],
+      ejemplo: ""
     }
   };
 
-  const rec = catalogo[endpoint] ?? catalogo.timeseries;
+  const rec = catalogo[endpoint] || catalogo.timeseries;
   return { endpoint, confianza, ...rec };
 }
 
-// --- DOM refs (con guards) ---
-const form = document.getElementById('formCasos');
-const objetivoSel = document.getElementById('objetivo');
-const espacialSel = document.getElementById('espacial');
-const temporalSel = document.getElementById('temporal');
-const btnRec = document.getElementById('recomendar');
+/******************************************
+ * DOM REFS
+ ******************************************/
+const form          = document.getElementById("formCasos");
+const objetivoSel   = document.getElementById("objetivo");
+const espacialSel   = document.getElementById("espacial");
+const temporalSel   = document.getElementById("temporal");
+const btnRec        = document.getElementById("recomendar");
 
-const panel = document.getElementById('resultado');
-const badgeEndpoint = document.getElementById('badgeEndpoint');
-const badgeConf = document.getElementById('badgeConf');
-const explicacion = document.getElementById('explicacion');
-const varsList = document.getElementById('vars');
-const ejemplo = document.getElementById('ejemplo');
+const panel         = document.getElementById("resultado");
+const badgeEndpoint = document.getElementById("badgeEndpoint");
+const badgeConf     = document.getElementById("badgeConf");
+const explicacion   = document.getElementById("explicacion");
+const varsList      = document.getElementById("vars");
+const ejemplo       = document.getElementById("ejemplo");
 
-const ctas = document.getElementById('ctas');
-const ctaMapa = document.getElementById('ctaMapa');
-const ctaAnalisis = document.getElementById('ctaAnalisis');
-const sendBtn = document.getElementById("sendBtn");
+// Contenedor de botones bajo el mapa (dos CTAs)
+const ctas          = document.getElementById("ctas");
+// Asegura que arranquen ocultos por si al HTML le faltó "hidden"
+if (ctas && !ctas.classList.contains("hidden")) ctas.classList.add("hidden");
 
-// --- Render seguro ---
+/******************************************
+ * RENDER DEL RECOMENDADOR
+ ******************************************/
 function renderRec(r) {
-  if (panel) panel.classList.remove('hidden');
+  panel?.classList.remove("hidden");
 
   if (badgeEndpoint) {
     badgeEndpoint.className = `inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold ${r.badgeClass}`;
     badgeEndpoint.textContent = r.titulo;
   }
-  if (badgeConf) badgeConf.textContent = `Confianza: ${(r.confianza*100).toFixed(0)}%`;
+  if (badgeConf) badgeConf.textContent = `Confianza: ${(r.confianza * 100).toFixed(0)}%`;
 
   if (explicacion) {
     explicacion.textContent =
-      r.endpoint === 'grid'
-        ? 'Recomendado Mapa: necesitas un campo espacial continuo para generar mapas o comparar áreas.'
-        : 'Recomendado Análisis de datos: necesitas una señal temporal precisa en uno o pocos puntos.';
+      r.endpoint === "grid"
+        ? "Recomendado Mapa: necesitas un campo espacial continuo para generar mapas o comparar áreas."
+        : "Recomendado Análisis de datos: necesitas una señal temporal precisa en uno o pocos puntos.";
   }
 
   if (varsList) {
-    varsList.innerHTML = '';
-    (r.vars || []).forEach(v => {
-      const li = document.createElement('li');
+    varsList.innerHTML = "";
+    r.vars.forEach(v => {
+      const li = document.createElement("li");
       li.textContent = v;
       varsList.appendChild(li);
     });
   }
 
-  if (ejemplo) ejemplo.textContent = r.ejemplo || '';
-
-  // CTAs
-  if (ctaMapa) ctaMapa.classList.toggle('recomendada', r.endpoint === 'grid');
-  if (ctaAnalisis) ctaAnalisis.classList.toggle('recomendada', r.endpoint === 'timeseries');
+  if (ejemplo) ejemplo.textContent = r.ejemplo || "";
 }
 
-// --- Eventos ---
-if (btnRec) {
-  btnRec.addEventListener('click', () => {
-    const datos = {
-      objetivo: objetivoSel?.value,
-      espacial: espacialSel?.value,
-      temporal: temporalSel?.value
-    };
-    const r = recomendar(datos);
-    renderRec(r);
-  });
-}
+/******************************************
+ * EVENTOS DEL RECOMENDADOR
+ ******************************************/
+btnRec?.addEventListener("click", () => {
+  const datos = {
+    objetivo:  objetivoSel?.value,
+    espacial:  espacialSel?.value,
+    temporal:  temporalSel?.value
+  };
+  const r = recomendar(datos);
+  renderRec(r);
+});
 
-// Reset nativo + limpiar
-if (form) {
-  form.addEventListener('reset', () => {
-    setTimeout(() => {
-      panel?.classList.add('hidden');
-      ejemplo && (ejemplo.textContent = '');
-      varsList && (varsList.innerHTML = '');
-      if (badgeEndpoint) { badgeEndpoint.textContent = ''; badgeEndpoint.className = ''; }
-      badgeConf && (badgeConf.textContent = '');
-      explicacion && (explicacion.textContent = '');
-      ctaMapa?.classList.remove('recomendada');
-      ctaAnalisis?.classList.remove('recomendada');
-    }, 0);
-  });
-}
+form?.addEventListener("reset", () => {
+  setTimeout(() => {
+    panel?.classList.add("hidden");
+    if (ejemplo) ejemplo.textContent = "";
+    if (varsList) varsList.innerHTML = "";
+    if (badgeEndpoint) { badgeEndpoint.textContent = ""; badgeEndpoint.className = ""; }
+    if (badgeConf)     badgeConf.textContent = "";
+    if (explicacion)   explicacion.textContent = "";
+    ctas?.classList.add("hidden"); // ocultar de nuevo los CTAs al limpiar
+  }, 0);
+});
 
-// Presets de tarjetas
-document.querySelectorAll('.case-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
+// Tarjetas predefinidas
+document.querySelectorAll(".case-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
     const tipo = btn.dataset.case;
     const presets = {
-      pv:   { objetivo:'mapa', espacial:'poligono', temporal:'min' },
-      wind: { objetivo:'hist',  espacial:'punto',    temporal:'hist' },
-      temp: { objetivo:'mapa',  espacial:'poligono', temporal:'min' }
+      pv:   { objetivo:"mapa", espacial:"poligono", temporal:"min" },
+      wind: { objetivo:"hist",  espacial:"punto",    temporal:"hist" },
+      temp: { objetivo:"mapa",  espacial:"poligono", temporal:"min" }
     };
     const r = recomendar(presets[tipo]);
     renderRec(r);
-    const res = document.getElementById('resultado');
+    const res = document.getElementById("resultado");
     if (res) {
       window.scrollTo({
         top: res.getBoundingClientRect().top + window.scrollY - 100,
-        behavior: 'smooth'
+        behavior: "smooth"
       });
     }
   });
 });
 
-// ===== Mapa principal =====
-const map = L.map("map").setView([19.4326, -99.1332], 12);
+/******************************************
+ * MAPA LEAFLET
+ ******************************************/
+const map = L.map("map").setView([19.4326, -99.1332], 11);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  attribution: "© OpenStreetMap contributors", maxZoom: 19
+  attribution: "© OpenStreetMap contributors",
+  maxZoom: 19
 }).addTo(map);
 
 let marker = null;
+let lastLatLng = null; // último punto seleccionado
+
+// Mostrar CTAs, actualizar href con lat/lon y enganchar GET fetch
+function showCTAsWithCoords(latlng) {
+  if (!ctas) return;
+
+  lastLatLng = latlng;
+
+  // (Opcional) añade ?lat=&lon= a cada link dentro de #ctas
+  ctas.querySelectorAll("a").forEach(a => {
+    try {
+      const url = new URL(a.getAttribute("href"), window.location.origin);
+      url.searchParams.set("lat", latlng.lat.toFixed(6));
+      url.searchParams.set("lon", latlng.lng.toFixed(6));
+      a.setAttribute("href", url.pathname + url.search);
+    } catch {
+      // rutas relativas sin origen: ignora
+    }
+  });
+
+  // Engancha eventos GET al backend (una sola vez por botón)
+  attachEndpointHandlers();
+
+  ctas.classList.remove("hidden");
+}
+
 function setPoint(latlng) {
   if (marker) map.removeLayer(marker);
+
   const lat = latlng.lat.toFixed(6);
   const lon = latlng.lng.toFixed(6);
+
   marker = L.marker(latlng).addTo(map)
-    .bindPopup(`<b>Lat:</b> ${lat}<br><b>Lng:</b> ${lon}`).openPopup();
-  coordsEl.textContent = `📍 Lat: ${lat} | Lng: ${lon}`;
-  sendBtn.classList.add("activo");
+    .bindPopup(`<b>Lat:</b> ${lat}<br><b>Lng:</b> ${lon}`)
+    .openPopup();
+
+  // Mostrar botones SOLO después de elegir punto
+  showCTAsWithCoords(latlng);
 }
+
 map.on("click", e => setPoint(e.latlng));
 
-L.Control.geocoder({ defaultMarkGeocode: false, placeholder: "Buscar lugar...", position: "topleft" })
-  .on("markgeocode", e => { const c = e.geocode.center; map.fitBounds(e.geocode.bbox); setPoint(c); })
-  .addTo(map);
+// Geocoder si está cargado en la página
+if (L.Control && L.Control.geocoder) {
+  L.Control.geocoder({
+    defaultMarkGeocode: false,
+    placeholder: "Buscar lugar...",
+    position: "topleft"
+  })
+    .on("markgeocode", e => {
+      const c = e.geocode.center;
+      map.fitBounds(e.geocode.bbox);
+      setPoint(c);
+    })
+    .addTo(map);
+} else {
+  console.warn("Leaflet Control Geocoder no disponible (asegúrate de incluir sus scripts en el HTML).");
+}
 
-infoBtn?.addEventListener("click", () => {
-  const vis = infoPopup.style.display === "block";
-  infoPopup.style.display = vis ? "none" : "block";
-});
+/******************************************
+ * CTAs -> FETCH GET AL BACKEND
+ ******************************************/
+function attachEndpointHandlers() {
+  const btnGrid = ctas.querySelector('a[data-endpoint="grid"]');
+  const btnTS   = ctas.querySelector('a[data-endpoint="timeseries"]');
 
-// ===== Enviar =====
-sendBtn.addEventListener("click", async () => {
-  try {
-    if (!marker) { alert("Selecciona un punto en el mapa."); return; }
-    const lat = +marker.getLatLng().lat.toFixed(6);
-    const lon = +marker.getLatLng().lng.toFixed(6);
-    await loadGeoTiff(lat, lon);
-  } catch (e) {
-    console.error("Error en Enviar:", e);
-    alert(e.message);
-  }
-});
+  [btnGrid, btnTS].forEach(btn => {
+    if (!btn || btn.dataset.bound === "1") return;
+
+    btn.addEventListener("click", async (ev) => {
+      ev.preventDefault();
+      if (!lastLatLng) { alert("Selecciona un punto en el mapa."); return; }
+
+      // Construye query
+      const params = new URLSearchParams({
+        lat: lastLatLng.lat.toFixed(6),
+        lon: lastLatLng.lng.toFixed(6),
+        objetivo:  objetivoSel?.value || "",
+        espacial:  espacialSel?.value || "",
+        temporal:  temporalSel?.value || ""
+      });
+
+      const type = btn.dataset.endpoint; // "grid" | "timeseries"
+      const url  = `${API[type]}?${params.toString()}`;
+
+      const originalText = btn.textContent;
+      btn.textContent = "Consultando...";
+      btn.classList.add("opacity-70", "pointer-events-none");
+
+      try {
+        const resp = await fetch(url, { method: "GET" });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+        const ct = (resp.headers.get("content-type") || "").toLowerCase();
+
+        if (ct.includes("application/json")) {
+          const data = await resp.json();
+          console.log(`✅ Respuesta ${type}:`, data);
+
+          // Ejemplo: guardar y navegar a otra página para visualizar
+          // localStorage.setItem(`${type}_result`, JSON.stringify(data));
+          // window.location.href = (type === 'grid')
+          //   ? '/routes/mapas/html/index.html'
+          //   : '/routes/analisis/html/index.html';
+
+          alert("Solicitud completada. Revisa la consola para ver el JSON.");
+
+        } else {
+          // Si es archivo (PNG/TIF/CSV...), abrir en nueva pestaña
+          const blob = await resp.blob();
+          const href = URL.createObjectURL(blob);
+          window.open(href, "_blank");
+        }
+
+      } catch (err) {
+        console.error(err);
+        alert("Error al consultar el backend: " + err.message);
+
+      } finally {
+        btn.textContent = originalText;
+        btn.classList.remove("opacity-70", "pointer-events-none");
+      }
+    });
+
+    // Evitar registrar múltiples veces si el usuario cambia de punto
+    btn.dataset.bound = "1";
+  });
+}
+ 
