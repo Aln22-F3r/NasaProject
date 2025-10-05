@@ -1,44 +1,86 @@
 <!DOCTYPE html>
+
 <html lang="es">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Análisis Climático Interactivo</title>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Análisis Climático Interactivo</title>
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    
-    <link rel="stylesheet" href="css/style.css">
+
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+
+
+<link rel="stylesheet" href="/routes/analisis/css/style.css">
+
+<script src="https://cdn.tailwindcss.com"></script>
+
 </head>
+
 <body>
-    <header>
-        <h1>Análisis de Potencial para Energías Renovables</h1>
-        <p>Selecciona un punto en el mapa para obtener datos. (Actualmente usando datos de muestra para CDMX)</p>
-    </header>
 
-    <main>
-        <div id="map"></div>
-        
-        <section id="dashboard">
-            <div id="info" class="card">
-                <h2>Resumen Anual</h2>
-                <p><strong>Ubicación:</strong> <span id="ubicacion">19.43, -99.13</span></p>
-                <div id="resumen-anual">
-                    </div>
-                <div id="acciones">
-                    <button id="descargarCsvBtn">Descargar Resumen en CSV</button>
-                </div>
-            </div>
+<header>
 
-            <div id="graficos" class="card">
-                <h2>Análisis Mensual</h2>
-                <canvas id="graficoViabilidad"></canvas>
-            </div>
-        </section>
-    </main>
-    
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
-    <script src="js/data.js"></script>         <script src="js/analysis.js"></script>     <script src="js/app.js"></script>          </body>
+<h1 class="text-center pt-7 text-4xl font-extrabold text-white mb-3 drop-shadow anim-fade-up" id="titulo">Análisis de Potencial para Energías Renovables</h1>
+
+<p class="text-white text-center drop-shadow pb-4">Selecciona un punto en el mapa para obtener datos. (Actualmente usando datos de muestra para CDMX)</p>
+
+</header>
+
+
+
+<main>
+
+<div id="map"></div>
+
+<section id="dashboard">
+
+<div id="graficos" class="card">
+
+<h2 class="text-white text-center py-14 text-2xl font-bold">Análisis Mensual</h2>
+
+<canvas id="graficoViabilidad"></canvas>
+
+</div>
+
+<div id="info" class="card">
+
+
+
+ <h2 class="text-white text-center py-14 text-2xl font-bold">Resumen Anual</h2>
+
+<p class="text-white text-center"><strong>Ubicación:</strong> <span id="ubicacion">19.43, -99.13</span></p>
+
+<div id="resumen-anual">
+
+</div>
+
+
+
+<div id="acciones" class="text-center">
+
+<button id="descargarCsvBtn" class=" relative inline-flex items-center justify-center px-8 py-4 rounded-full font-semibold bg-[#b71c1c] text-white shadow-lg transition
+
+hover:scale-105 hover:bg-[#8e0000] focus:outline-none focus:ring-2 focus:ring-red-600/60 btn-border-anim">Descargar Resumen en CSV</button>
+
+</div>
+
+</div>
+
+
+
+</section>
+
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script src="js/data.js"></script> <script src="js/analysis.js"></script> <script src="js/app.js"></script></body>
+
 </html>
