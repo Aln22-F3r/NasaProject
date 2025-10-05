@@ -16,24 +16,7 @@ function recomendar({ objetivo, espacial, temporal }) {
     timeseries: {
       badgeClass: 'badge-ts',
       titulo: 'Analisis de datos',
-      vars: ['Temperatura del aire a 2 metros sobre la superficie terrestre, en grados Celsius', 'Velocidad del viento a 10 m de altura sobre el terreno, en metros por segundo.', 'cantidad total de radiación solar recibida en una superficie horizontal'],
-      ejemplo:
-`GET https://api.meteomatics.com/{start}--{end}:{step}/{parameter}/{lat},{lon}/json
-Auth: user:pass
-
-Ejemplo:
-.../2025-01-01T00:00Z--2025-01-07T00:00Z:PT1H/temperature_2m:C,wind_speed_10m:ms/19.43,-99.13/json`
-    },
-    grid: {
-      badgeClass: 'badge-grid',
-      titulo: 'Mapa',
-      vars: ['Temperatura del aire a 2 metros sobre la superficie terrestre, en grados Celsius', 'Velocidad del viento a 10 m de altura sobre el terreno, en metros por segundo.', 'Cantidad de radiación solar directa recibida por unidad de superficie orientada perpendicularmente a los rayos solares, medida en W/m²'],
-      ejemplo:
-`GET https://api.meteomatics.com/{valid_time}/{parameter}/{lat1},{lon1}:{lat2},{lon2}:{res_lat},{res_lon}/json
-Auth: user:pass
-
-Ejemplo:
-.../2025-01-01T12:00Z/temperature_2m:C/20.5,-100.5:18.0,-98.0:0.1,0.1/json`
+      vars: ['Temperatura del aire a 2 metros sobre la superficie terrestre, en grados Celsius', 'Velocidad del viento a 10 m de altura sobre el terreno, en metros por segundo.', 'cantidad total de radiación solar recibida en una superficie horizontal']
     }
   };
 
@@ -58,6 +41,7 @@ const ejemplo = document.getElementById('ejemplo');
 const ctas = document.getElementById('ctas');
 const ctaMapa = document.getElementById('ctaMapa');
 const ctaAnalisis = document.getElementById('ctaAnalisis');
+const sendBtn = document.getElementById("sendBtn");
 
 // --- Render seguro ---
 function renderRec(r) {
@@ -90,7 +74,6 @@ function renderRec(r) {
   // CTAs
   if (ctaMapa) ctaMapa.classList.toggle('recomendada', r.endpoint === 'grid');
   if (ctaAnalisis) ctaAnalisis.classList.toggle('recomendada', r.endpoint === 'timeseries');
-  if (ctas) ctas.classList.add('show');
 }
 
 // --- Eventos ---
@@ -116,9 +99,8 @@ if (form) {
       if (badgeEndpoint) { badgeEndpoint.textContent = ''; badgeEndpoint.className = ''; }
       if (badgeConf) badgeConf.textContent = '';
       if (explicacion) explicacion.textContent = '';
-      if (ctas) ctas.classList.remove('show');
-      if (ctaMapa) ctaMapa.classList.remove('recomendada');
-      if (ctaAnalisis) ctaAnalisis.classList.remove('recomendada');
+      if (ctaMapa) ctaMapa.classList.toggle('recomendada', r.endpoint === 'grid');
+      if (ctaAnalisis) ctaAnalisis.classList.toggle('recomendada', r.endpoint === 'timeseries');
     }, 0);
   });
 }
@@ -143,3 +125,43 @@ document.querySelectorAll('.case-btn').forEach(btn => {
     }
   });
 });
+
+  // ===== Mapa principal =====
+  const map = L.map("map").setView([19.4326, -99.1332], 12);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© OpenStreetMap contributors", maxZoom: 19
+  }).addTo(map);
+
+  let marker = null;
+  function setPoint(latlng) {
+    if (marker) map.removeLayer(marker);
+    const lat = latlng.lat.toFixed(6);
+    const lon = latlng.lng.toFixed(6);
+    marker = L.marker(latlng).addTo(map)
+      .bindPopup(`<b>Lat:</b> ${lat}<br><b>Lng:</b> ${lon}`).openPopup();
+    coordsEl.textContent = `📍 Lat: ${lat} | Lng: ${lon}`;
+    sendBtn.classList.add("activo");
+  }
+  map.on("click", e => setPoint(e.latlng));
+
+  L.Control.geocoder({ defaultMarkGeocode: false, placeholder: "Buscar lugar...", position: "topleft" })
+    .on("markgeocode", e => { const c = e.geocode.center; map.fitBounds(e.geocode.bbox); setPoint(c); })
+    .addTo(map);
+
+  infoBtn?.addEventListener("click", () => {
+    const vis = infoPopup.style.display === "block";
+    infoPopup.style.display = vis ? "none" : "block";
+  });
+
+    // ===== Enviar =====
+    sendBtn.addEventListener("click", async () => {
+      try {
+        if (!marker) { alert("Selecciona un punto en el mapa."); return; }
+        const lat = +marker.getLatLng().lat.toFixed(6);
+        const lon = +marker.getLatLng().lng.toFixed(6);
+        await loadGeoTiff(lat, lon);
+      } catch (e) {
+        console.error("Error en Enviar:", e);
+        alert(e.message);
+      }
+    });

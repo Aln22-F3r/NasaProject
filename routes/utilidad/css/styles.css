@@ -44,15 +44,19 @@ a.btn-border-anim:focus-visible::before{animation-play-state:running}
 .expand{transition:max-height .35s ease, opacity .25s ease}
 .expand.show{max-height:200px;opacity:1}
 
+/* CTAs: tamaño normal y rojo fijo */
 .btn-cta{
   display:inline-flex;align-items:center;justify-content:center;
-  padding:.8rem 1.2rem;border-radius:9999px;font-weight:600;
-  border:1px solid #374151;background:rgba(255,255,255,.06);color:#fff;
-  transition:transform .15s ease, background .15s ease, border-color .15s ease
+  padding:.5rem 1rem;font-size:.875rem;font-weight:600;line-height:1.2;
+  border-radius:9999px;background:#b71c1c;border:1px solid #7f1d1d;color:#fff;
+  transition:transform .15s ease, background .15s ease, border-color .15s ease;
 }
-.btn-cta:hover{transform:translateY(-1px);background:rgba(255,255,255,.12)}
-.btn-cta.recomendada{background:#b71c1c;border-color:#7f1d1d}
+.btn-cta:hover{background:#8e0000;transform:translateY(-1px)}
+
+/* Opcional: resaltar recomendada sin cambiar color */
+.btn-cta.recomendada{box-shadow:0 0 0 2px rgba(190,18,60,.35)}
 .btn-cta.recomendada:hover{background:#8e0000}
+
 
 /* Cards predefinidas */
 .case-card{background:rgba(0,0,0,.55);border:1px solid #374151;border-radius:1rem;padding:1rem;transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease}

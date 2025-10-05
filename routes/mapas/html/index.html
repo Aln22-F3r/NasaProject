@@ -5,91 +5,77 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mapa de Viabilidad Energética</title>
 
-  <!-- Tailwind CSS -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
+  
 
-  <!-- Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <!-- Leaflet (SIEMPRE primero) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin></script>
+
+  <!-- GeoTIFF + Plotty + Leaflet-Geotiff (jsDelivr, versiones fijas) --><script defer src="https://cdn.jsdelivr.net/npm/geotiff@2.0.7/dist-browser/geotiff.min.js"></script>
+  <script src="/routes/mapas/vendor/geotiff.min.js"></script>
+  <script src="/routes/mapas/vendor/plotty.min.js"></script>
+  <script src="/routes/mapas/vendor/leaflet-geotiff.min.js"></script>
+  <script src="/routes/mapas/vendor/leaflet-geotiff-plotty.min.js"></script>  
+
+  <!-- Tu JS al final del body -->
+  <script src="/routes/mapas/js/script.js"></script>
 
   <!-- Leaflet Geocoder -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
   <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
-  <!-- Estilos personalizados -->
+  <!-- Estilos -->
   <link rel="stylesheet" href="/routes/mapas/css/styles.css" />
 </head>
 
 <body class="body-page flex flex-col items-center justify-start min-h-screen px-4 pb-12">
 
-  <!-- ENCABEZADO -->
-  <h1 class="titulo-principal mt-6 text-center">
-    Mapa de Viabilidad Energética Global
-  </h1>
+  <h1 class="titulo-principal mt-6 text-center">Mapa de Viabilidad Energética Global</h1>
 
   <div class="boton-regresar-container mt-2">
-    <a href="/routes/inicio/html/index.html" class="boton-regresar">
-      ← Regresar al inicio
-    </a>
+    <a href="/routes/inicio/html/index.html" class="boton-regresar">← Regresar al inicio</a>
   </div>
 
-  <!-- DESCRIPCIÓN -->
   <p class="texto-descriptivo max-w-3xl mt-4 mb-6 text-center leading-relaxed">
-    La imagen generada proviene de un archivo geoespacial en el que cada píxel
-    representa un área de <span class="resaltado">2 × 2 kilómetros</span>. Cada
-    punto contiene datos climáticos y ambientales asociados, como temperatura,
-    radiación solar y velocidad del viento, lo que permite identificar las
-    regiones con mayor potencial para la implementación de proyectos de energía
-    limpia.
+    La imagen proviene de un GeoTIFF donde cada píxel representa un área de
+    <span class="resaltado">2 × 2 km</span>. El panel lateral muestra el raster; al hacer clic se lee el valor del píxel.
   </p>
 
-  <!-- SECCIÓN DEL MAPA Y RESULTADOS -->
   <div class="mapa-general flex flex-col md:flex-row w-full max-w-6xl gap-6">
-
-    <!-- CONTENEDOR MAPA -->
+    <!-- Mapa principal -->
     <div class="map-container relative rounded-2xl overflow-hidden shadow-lg md:w-2/3 mx-auto">
-
       <div id="map" class="rounded-2xl w-full h-96 md:h-[500px]"></div>
-
-      <!-- BOTÓN DE INFO -->
       <div class="info-sobre-mapa absolute top-3 right-3 z-[9999]">
         <button id="infoBtn" class="boton-info">ℹ️</button>
         <div id="infoPopup" class="popup-info hidden">
-          <p>Selecciona una ubicación en el mapa para analizar su potencial energético.</p>
-          <p>Luego haz clic en <span class="resaltado">“Enviar”</span> para visualizar los datos.</p>
+          <p>Selecciona una ubicación y pulsa <span class="resaltado">Enviar</span>.</p>
         </div>
       </div>
     </div>
 
-    <!-- CONTENEDOR TIF -->
+    <!-- Panel GeoTIFF -->
     <div id="mapaTif" class="mapa-tif hidden md:w-1/3 h-96 md:h-[500px] flex items-center justify-center bg-gray-800/80 rounded-lg text-gray-300 italic">
-      🗺️ Vista TIF simulada
+      🗺️ Vista GeoTIFF
     </div>
-
   </div>
 
-  <!-- COORDENADAS Y BOTÓN -->
   <div class="controles-mapa flex flex-col items-center justify-center gap-3 mt-4 w-full max-w-6xl">
-    <p id="coords" class="texto-coords text-[#38bdf8] font-mono text-sm">
-      Selecciona un punto...
-    </p>
-    <button id="sendBtn" class="boton-enviar">Enviar</button>
+    <p id="coords" class="texto-coords text-[#38bdf8] font-mono text-sm">Selecciona un punto...</p>
+    <button id="sendBtn" class="boton-enviar">Analisis de mapeo geografico</button>
+    <button id="sendBtn" class="boton-enviar">Analisis de datos</button>
   </div>
 
-  <!-- RESULTADOS ABAJO -->
   <div id="resultados" class="resultados hidden bg-[#1e293b]/80 text-white rounded-2xl p-6 w-full max-w-6xl mt-6 shadow-lg">
     <h2 class="titulo-datos text-xl font-semibold mb-3">Resultados del análisis</h2>
     <p id="infoSeleccion" class="info-seleccion mb-4 text-sm italic">Aún no se ha seleccionado una ubicación.</p>
-
     <div class="contenedor-datos grid grid-cols-3 gap-4">
       <p><span class="font-semibold">Temperatura:</span> <span id="tempDato">-- °C</span></p>
       <p><span class="font-semibold">Radiación solar:</span> <span id="radDato">-- W/m²</span></p>
       <p><span class="font-semibold">Velocidad del viento:</span> <span id="vientoDato">-- km/h</span></p>
     </div>
+  </div>
 
-
-
-  <!-- SCRIPT -->
-  <script src="/routes/mapas/js/script.js"></script>
 </body>
 </html>

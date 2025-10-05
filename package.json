@@ -1,0 +1,25 @@
+{
+  "name": "nasaproject",
+  "version": "1.0.0",
+  "description": "# SatelitLeo",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Aln22-F3r/NasaProject.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Aln22-F3r/NasaProject/issues"
+  },
+  "homepage": "https://github.com/Aln22-F3r/NasaProject#readme",
+  "dependencies": {
+    "geotiff": "^2.0.7",
+    "leaflet-geotiff-2": "^1.1.0",
+    "plotty": "^0.4.7"
+  }
+}
