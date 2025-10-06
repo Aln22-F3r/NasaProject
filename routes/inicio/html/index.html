@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>SatelitLeo - Plataforma Climática Satelital</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/routes/inicio/css/styles.css">
+</head>
+<body class="min-h-screen text-white font-sans relative overflow-x-hidden">
+
+  <!-- Vignette y malla sutil sobre el fondo existente -->
+  <div class="pointer-events-none fixed inset-0 -z-10">
+    <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60"></div>
+    <div class="absolute inset-0 grid-overlay"></div>
+  </div>
+
+  <section class="flex flex-col items-start justify-center text-left px-6 py-20 relative z-10 max-w-5xl mx-auto">
+    <img src="/images/Logo_Nasa.png" alt="Logo NASA" class="h-40 md:h-56 mb-10 drop-shadow-xl animate-pulse-nasa">
+
+    <!-- Título + subrayado animado -->
+    <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-3 drop-shadow anim-fade-up" style="animation-delay:80ms">
+      SatelitLeo: Plataforma Climática Satelital
+    </h1>
+    <span class="inline-block h-1 w-28 rounded bg-[#b71c1c] anim-slide-bar" aria-hidden></span>
+
+    <!-- Introducción -->
+    <p class="text-lg md:text-xl text-gray-300 max-w-3xl leading-relaxed mt-6 mb-6 anim-fade-up" style="animation-delay:180ms">
+      <span class="font-semibold text-white">SatelitLeo</span> es una aplicación web orientada al
+      análisis meteorológico y geoespacial en tiempo real. Su propósito es demostrar cómo la integración
+      de datos satelitales de alta precisión puede emplearse para visualizar, analizar y comprender patrones
+      climáticos de manera accesible y científica.
+    </p>
+
+    <p class="text-lg md:text-xl text-gray-300 max-w-3xl leading-relaxed mb-8 anim-fade-up" style="animation-delay:260ms">
+      Nuestra plataforma muestra cómo podría desarrollarse una herramienta de este tipo:
+      combinando datos de la <span class="font-semibold text-white">API de la NASA</span>
+      con la tecnología meteorológica de <span class="font-semibold text-white">Meteomatics</span>
+      para generar mapas, series temporales y análisis interactivos.
+    </p>
+
+    <!-- Explicación técnica -->
+    <p class="text-lg md:text-xl text-gray-300 max-w-3xl leading-relaxed mb-4 anim-fade-up" style="animation-delay:320ms">
+      SatelitLeo utiliza dos endpoints clave de Meteomatics:
+    </p>
+    <ul class="list-disc list-inside text-gray-300 text-lg md:text-xl mb-8 space-y-2 anim-fade-up" style="animation-delay:380ms">
+      <li>
+        <span class="font-semibold text-white">Time Series</span>: permite obtener valores
+        meteorológicos en puntos geográficos específicos a lo largo del tiempo. Ideal para análisis
+        climáticos detallados, históricos o en tiempo real.
+      </li>
+      <li>
+        <span class="font-semibold text-white">Grid</span>: devuelve información meteorológica
+        distribuida en una rejilla espacial, permitiendo generar mapas y representaciones geoespaciales
+        completas de variables como temperatura, viento o radiación solar.
+      </li>
+    </ul>
+
+    <!-- Card CTA anchura completa -->
+    <div class="bg-black/70 w-full rounded-2xl shadow-lg px-8 py-6 border border-gray-700 backdrop-blur-sm flex flex-col md:flex-row md:items-center md:justify-between gap-6 anim-fade-up"
+         style="animation-delay:460ms">
+      <div>
+        <p class="text-xl md:text-2xl text-[#b71c1c] font-semibold mb-3">Objetivo</p>
+        <p class="text-white text-lg md:text-xl max-w-2xl">
+          Demostrar cómo la integración de datos satelitales y meteorológicos puede usarse para construir
+          herramientas interactivas de análisis climático y potencial energético a nivel global.
+        </p>
+      </div>
+
+      <a href="/routes/utilidad/html/index.html"
+   class="relative inline-flex items-center justify-center px-8 py-4 rounded-full font-semibold bg-[#b71c1c] text-white shadow-lg transition
+          hover:scale-105 hover:bg-[#8e0000] focus:outline-none focus:ring-2 focus:ring-red-600/60 btn-border-anim">
+  <span class="relative z-10">Explorar SatelitLeo</span>
+</a>
+    </div>
+  </section>
+
+  <footer class="w-full py-8 text-center relative z-10 anim-fade-up" style="animation-delay:520ms">
+    <hr class="w-1/2 max-w-lg border-t border-gray-700 mx-auto mb-6">
+    <a href="/routes/aboutUs/html/index.html" class="text-gray-300 font-medium hover:text-white transition-colors hover:underline">
+      Sobre Nosotros
+    </a>
+    <p class="text-gray-500 text-xs mt-4">© 2025 SatelitLeo Project. Todos los derechos reservados.</p>
+  </footer>
+</body>
+</html>

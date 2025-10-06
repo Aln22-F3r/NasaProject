@@ -1,0 +1,101 @@
+/* ------------------------------------------- */
+/* Fondo existente: imagen de estrellas */
+/* ------------------------------------------- */
+body{
+  background-image: url("/images/Fondo_Inicio.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* Malla sutil encima del fondo */
+.grid-overlay{
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.08) 1px, transparent 0);
+  background-size: 22px 22px;
+  opacity: .18;
+}
+
+/* ------------------------------------------- */
+/* Animación del logo (ya tenías) */
+/* ------------------------------------------- */
+@keyframes pulse-nasa{
+  0%,100%{ transform: scale(1); filter: drop-shadow(0 0 5px rgba(255,255,255,.3)); }
+  50%{ transform: scale(1.05); filter: drop-shadow(0 0 15px rgba(255,255,255,.7)); }
+}
+.animate-pulse-nasa{ animation: pulse-nasa 3s infinite ease-in-out; }
+
+/* ------------------------------------------- */
+/* Entradas suaves en carga (sin JS) */
+/* ------------------------------------------- */
+@keyframes fadeUp{
+  0%{ opacity:0; transform: translateY(16px) }
+  100%{ opacity:1; transform: translateY(0) }
+}
+.anim-fade-up{ animation: fadeUp .7s ease-out both; }
+
+/* Subrayado deslizante del título */
+@keyframes slideBar{
+  0%{ transform: scaleX(0); opacity:.2 }
+  100%{ transform: scaleX(1); opacity:1 }
+}
+.anim-slide-bar{
+  transform-origin: left;
+  animation: slideBar .8s ease-out both;
+}
+
+/* Botón con shimmer suave (solo CSS) */
+
+/* ========================= */
+/* Borde luminoso animado (versión suave) */
+/* ========================= */
+@keyframes borderFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 400% 50%;
+  }
+}
+
+.btn-border-anim {
+  position: relative;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.btn-border-anim::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(90deg, #ff4b4b, #ffffff, #ff4b4b, #ff4b4b);
+  background-size: 400% 400%;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  animation: borderFlow 5s ease-in-out infinite;
+  z-index: -1;
+}
+
+
+
+.btn-shimmer::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: linear-gradient(115deg, transparent 0%, rgba(255,255,255,.18) 50%, transparent 100%);
+  width: 35%;
+  filter: blur(2px);
+  transform: translateX(-120%) skewX(-18deg);
+  animation: shimmer 1.3s linear infinite;
+  pointer-events: none;
+}
+
+/* Accesibilidad: reducir movimiento */
+@media (prefers-reduced-motion: reduce){
+  *{ animation: none !important; transition: none !important; }
+}

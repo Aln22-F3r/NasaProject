@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>SatelitLeo – Casos de uso & Análisis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin></script>
+
+  <!-- Geocoder (opcional) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+  <!-- Fondo/estilos propios -->
+  <link rel="stylesheet" href="/routes/utilidad/css/styles.css" />
+</head>
+<body class="body-page min-h-screen text-white font-sans">
+
+  <main class="px-5 md:px-6 py-8 md:py-10 max-w-6xl mx-auto space-y-10">
+
+    <!-- HERO -->
+    <header class="text-center space-y-2">
+      <h1 class="text-3xl md:text-5xl font-extrabold">Casos de uso</h1>
+      <p class="text-gray-300 max-w-3xl mx-auto">
+        Selecciona un escenario. Te indicamos el endpoint óptimo (<span class="font-semibold">Análisis de datos</span> o <span class="font-semibold">Mapa</span>)
+        y las variables típicas.
+      </p>
+    </header>
+
+    <!-- ASISTENTE DE RECOMENDACIÓN -->
+    <section class="w-full rounded-2xl border border-gray-700/60 bg-black/40 p-5 space-y-5">
+      <h2 class="text-xl md:text-2xl font-semibold">Asistente de recomendación</h2>
+
+      <form id="formCasos" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm text-gray-300 mb-2">Objetivo</label>
+            <select id="objetivo" name="objetivo" class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2">
+              <option value="sitio" selected>Evaluar un sitio puntual</option>
+              <option value="mapa">Mapear un área</option>
+              <option value="hist">Analizar histórico</option>
+              <option value="now">Monitoreo en tiempo real</option>
+              <option value="comparar">Comparar zonas</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-300 mb-2">Alcance espacial</label>
+            <select id="espacial" name="espacial" class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2">
+              <option value="punto" selected>Punto</option>
+              <option value="poligono">Área / bounding box</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-300 mb-2">Resolución temporal</label>
+            <select id="temporal" name="temporal" class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2">
+              <option value="min" selected>Minutal/horaria</option>
+              <option value="dia">Diaria</option>
+              <option value="mes">Mensual</option>
+              <option value="hist">Rango histórico</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+          <button id="recomendar" type="button"
+            class="px-6 py-3 rounded-full font-semibold bg-[#b71c1c] hover:bg-[#8e0000] text-white">
+            Obtener recomendación
+          </button>
+          <button id="limpiar" type="reset"
+            class="px-5 py-2 rounded-full font-semibold bg-white/10 text-white border border-gray-700 hover:bg-white/20">
+            Limpiar
+          </button>
+        </div>
+
+        <!-- Resultado -->
+        <div id="resultado" class="hidden rounded-xl border border-gray-700 bg-black/50 p-5" role="region" aria-live="polite">
+          <div class="flex items-center gap-2 mb-3">
+            <span id="badgeEndpoint" class="inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold"></span>
+            <span id="badgeConf" class="text-xs text-gray-400"></span>
+          </div>
+          <p id="explicacion" class="text-gray-300 mb-4"></p>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <h3 class="font-semibold">Variables sugeridas</h3>
+              <ul id="vars" class="list-disc list-inside text-gray-300 text-sm"></ul>
+            </div>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <!-- CASOS FRECUENTES -->
+    <section class="space-y-4">
+      <h2 class="text-xl md:text-2xl font-semibold">Casos frecuentes</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <article class="rounded-2xl border border-gray-700/60 bg-black/40 p-4">
+          <h3 class="font-semibold text-lg">Radiación solar para fotovoltaica</h3>
+          <p class="text-gray-300">Estimación de potencial solar por zona para dimensionamiento preliminar.</p>
+          <div class="mt-2 flex gap-2 text-xs">
+            <span class="bg-white/10 px-2 py-1 rounded-full">Mapa</span>
+            <span class="bg-white/10 px-2 py-1 rounded-full">Área</span>
+            <span class="bg-white/10 px-2 py-1 rounded-full">Horaria</span>
+          </div>
+          <button class="case-btn mt-3 px-4 py-2 rounded-full bg-[#b71c1c] hover:bg-[#8e0000]" data-case="pv">Ver recomendación</button>
+        </article>
+
+        <article class="rounded-2xl border border-gray-700/60 bg-black/40 p-4">
+          <h3 class="font-semibold text-lg">Viento para eólica en sitio</h3>
+          <p class="text-gray-300">Validación de recurso eólico en un punto con serie histórica.</p>
+          <div class="mt-2 flex gap-2 text-xs">
+            <span class="bg-white/10 px-2 py-1 rounded-full">Análisis de datos</span>
+            <span class="bg-white/10 px-2 py-1 rounded-full">Punto</span>
+            <span class="bg-white/10 px-2 py-1 rounded-full">Histórico</span>
+          </div>
+          <button class="case-btn mt-3 px-4 py-2 rounded-full bg-[#b71c1c] hover:bg-[#8e0000]" data-case="wind">Ver recomendación</button>
+        </article>
+
+        <article class="rounded-2xl border border-gray-700/60 bg-black/40 p-4">
+          <h3 class="font-semibold text-lg">Mapa de temperatura superficial</h3>
+          <p class="text-gray-300">Mapa temático para condiciones térmicas actuales.</p>
+          <div class="mt-2 flex gap-2 text-xs">
+            <span class="bg-white/10 px-2 py-1 rounded-full">Mapa</span>
+            <span class="bg-white/10 px-2 py-1 rounded-full">Área</span>
+            <span class="bg-white/10 px-2 py-1 rounded-full">Actual</span>
+          </div>
+          <button class="case-btn mt-3 px-4 py-2 rounded-full bg-[#b71c1c] hover:bg-[#8e0000]" data-case="temp">Ver recomendación</button>
+        </article>
+      </div>
+    </section>
+
+    <!-- MAPA -->
+    <section class="w-full rounded-2xl border border-gray-700/60 bg-black/40 p-5 space-y-4">
+      <h2 class="text-xl md:text-2xl font-semibold text-center">Mapa (elige un punto)</h2>
+      <div id="map" class="w-full h-[360px] md:h-[500px] rounded-xl overflow-hidden"></div>
+      <p id="pointInfo" class="text-center text-gray-200">Haz clic en el mapa para seleccionar un punto.</p>
+    </section>
+
+    <!-- PARÁMETROS (sin lat/lon/fechas) -->
+    <section class="w-full rounded-2xl border border-gray-700/60 bg-black/40 p-5 space-y-4">
+      <h2 class="text-lg font-semibold text-center">Parámetros del análisis</h2>
+
+      <form id="paramForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm mb-1">Parámetros (params)</label>
+          <input type="text" id="params" class="w-full rounded-md p-2 text-black"
+                 placeholder="Ej: t_2m:C,wind_speed_10m:ms" value="t_2m:C" />
+          <p class="text-xs text-gray-300 mt-1">Separa por coma si envías varios.</p>
+        </div>
+        <div>
+          <label class="block text-sm mb-1">Paso temporal (step)</label>
+          <input type="text" id="step" class="w-full rounded-md p-2 text-black"
+                 placeholder="Ej: PT1H, PT3H, PT9H" value="PT9H" />
+          <p class="text-xs text-gray-300 mt-1">Formato ISO 8601 (PT#H).</p>
+        </div>
+        <div>
+          <label class="block text-sm mb-1">Resolución latitud (res_lat) [Grid]</label>
+          <input type="number" step="0.01" id="res_lat" class="w-full rounded-md p-2 text-black"
+                 placeholder="Ej: 0.02" value="0.02" />
+        </div>
+        <div>
+          <label class="block text-sm mb-1">Resolución longitud (res_lon) [Grid]</label>
+          <input type="number" step="0.01" id="res_lon" class="w-full rounded-md p-2 text-black"
+                 placeholder="Ej: 0.02" value="0.02" />
+        </div>
+      </form>
+
+      <p class="text-center text-xs text-gray-300">
+        Rango de tiempo automático: últimos <b>365 días</b> hasta ahora.
+      </p>
+    </section>
+
+    <!-- CTAs -->
+    <section class="text-center">
+      <div id="ctas" class="hidden flex flex-wrap gap-4 justify-center">
+        <a href="#" class="px-6 py-3 rounded-full font-semibold bg-[#b71c1c] hover:bg-[#8e0000] text-white"
+           data-endpoint="grid">
+          Analizar como Mapa (Grid)
+        </a>
+        <a href="#" class="px-6 py-3 rounded-full font-semibold bg-[#b71c1c] hover:bg-[#8e0000] text-white"
+           data-endpoint="timeseries">
+          Analizar como Serie Temporal (Time Series)
+        </a>
+      </div>
+      <p class="text-xs text-gray-300 mt-2">Los botones aparecen cuando elijas una ubicación en el mapa.</p>
+    </section>
+  </main>
+
+  <footer class="py-8 text-center text-gray-400 text-sm">
+    © 2025 SatelitLeo Project
+  </footer>
+
+  <!-- Lógica (usa el mismo scripts.js que ya tienes) -->
+  <script src="/routes/utilidad/js/scripts.js"></script>
+</body>
+</html>

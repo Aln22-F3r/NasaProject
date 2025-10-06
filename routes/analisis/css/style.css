@@ -1,0 +1,7 @@
+body{
+  background-image: url("/images/Fondo_Inicio.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
